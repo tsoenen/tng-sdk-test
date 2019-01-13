@@ -1,23 +1,17 @@
 FROM ubuntu:xenial
 MAINTAINER askhat.nuriddinov@ugent.be
 
-# define interface names (should be the same as in VNFD)
-ENV IFIN input
-ENV IFOUT output
-
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y -q \
 	net-tools \
 	iproute \
 	curl \
 	netcat \
 	netrw \
-	socat
-
-ADD start.sh start.sh
-RUN chmod +x start.sh
+	socat \
+	python-scapy
 
 # set entry point for emulator gatekeeper
-ENV SON_EMU_CMD ./start.sh
+ENV SON_EMU_CMD "echo Traffic generator started"
 
 # normal entry point
 CMD /bin/bash

@@ -8,6 +8,10 @@ vnfs = {
     'sniffer': {
         'source': os.path.join(_vnfs_dir, 'sniffer'),
         'interfaces': ['input', 'output']
+    },
+    'generator': {
+        'source': os.path.join(_vnfs_dir, 'generator'),
+        'interfaces': ['cp01']
     }
 }
 
