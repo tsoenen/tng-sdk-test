@@ -23,7 +23,7 @@ def testbed():
     ('/error', 'Error 404')
 ])
 def test_server(test_input, expected_output, testbed):
-    test_command = 'curl -s {}{}'.format(testbed.server.ip(0), test_input)
+    test_command = 'curl -s {}{}'.format(testbed.server.get_ip(0), test_input)
     _, actual_output = testbed.client.execute(test_command)
 
     assert expected_output == actual_output
@@ -36,11 +36,11 @@ def test_server(test_input, expected_output, testbed):
 def test_snort(test_input, expected_output, testbed):
     start_time = datetime.datetime.utcnow()
  
-    test_command = 'curl -s {}{}'.format(testbed.server.ip(0), test_input)
+    test_command = 'curl -s {}{}'.format(testbed.server.get_ip(0), test_input)
     testbed.client.execute(test_command)
     time.sleep(1)
 
-    alert_records = testbed.snort.get_output_from_file('/snort-logs/alert')
+    alert_records = testbed.snort.get_file('/snort-logs/alert')
     actual_output = []
     for record in alert_records.splitlines():
         record_time = datetime.datetime.strptime(str(datetime.datetime.utcnow().year) + '/' + record.split()[0], SNORT_TIME_FORMAT)
