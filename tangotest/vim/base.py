@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 import json
 
+
 class BaseVIM(object):
     __metaclass__ = ABCMeta
 
@@ -56,8 +57,15 @@ class BaseVIM(object):
         if sniff:
             sniffer_name = 'sniffer_{}_{}_{}_{}'.format(src_vnf, src_if, dst_vnf, dst_if)
             self.add_test_vnf(sniffer_name, 'sniffer')
-            self.add_link(src_vnf, src_if, sniffer_name, self.instances[sniffer_name].interfaces[0], sniff=False, **kwargs)
-            self.add_link(sniffer_name, self.instances[sniffer_name].interfaces[1], dst_vnf, dst_if, sniff=False, **kwargs)
+
+            self.add_link(src_vnf, src_if,
+                          sniffer_name, self.instances[sniffer_name].interfaces[0],
+                          sniff=False, **kwargs)
+
+            self.add_link(sniffer_name, self.instances[sniffer_name].interfaces[1],
+                          dst_vnf, dst_if,
+                          sniff=False, **kwargs)
+
             return True
         else:
             return False
@@ -80,21 +88,20 @@ class BaseVIM(object):
             (generator): Sniffed packets
         """
 
-        # TODO: global variables
         sniffer_name = 'sniffer_{}_{}_{}_{}'.format(src_vnf, src_if, dst_vnf, dst_if)
         sniffer_file = 'tangosniffed.json'
-
         sniffer = self.instances.get(sniffer_name)
 
         if not sniffer:
             raise Exception('Sniffer is not added to this link')
 
         traffic = sniffer.get_file(sniffer_file)
-	if not traffic:
+        if not traffic:
             return []
-	traffic += ']'
-	traffic = json.loads(traffic)
-	traffic = [packet['_source']['layers'] for packet in traffic]
+
+        traffic += ']'
+        traffic = json.loads(traffic)
+        traffic = [packet['_source']['layers'] for packet in traffic]
         return traffic
 
 
@@ -117,7 +124,7 @@ class BaseInstance(object):
         if isinstance(interface, int):
             interface = self.interfaces[interface]
         if isinstance(interface, str):
-            cmd = "ip -4 addr show {} | grep -oP '(?<=inet\s)\d+(\.\d+){{3}}'".format(interface)
+            cmd = 'ip -4 addr show {} | grep -oP \'(?<=inet\s)\d+(\.\d+){{3}}\''.format(interface)
             code, output = self.execute(cmd)
 
             ip = output.strip()
@@ -133,17 +140,16 @@ class BaseInstance(object):
         if code != 0:
             raise IOError('No such file or directory: \'{}\''.format(path))
         return output
-    
+
     def get_stdout(self):
         pass
-    
+
     def get_stderr(self):
         pass
-    
+
     def get_jounalctl(self, params):
         pass
 
     @abstractmethod
     def execute(self, cmd, stream=False, **kwargs):
         pass
-

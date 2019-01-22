@@ -14,4 +14,3 @@ vnfs = {
         'interfaces': ['cp01']
     }
 }
-

@@ -5,7 +5,6 @@ import requests
 from mininet.node import RemoteController
 
 from emuvim.cli.rest.compute import RestApiClient as EmuComputeClient
-from emuvim.cli.rest.datacenter import RestApiClient as EmuDatacenterClient
 from emuvim.cli.rest.network import RestApiClient as EmuNetworkClient
 
 from emuvim.dcemulator.net import DCNetwork
@@ -97,20 +96,23 @@ class Emulator(BaseVIM):
         # Upload the package
         with open(package, 'rb') as package_content:
             files = {'package': package_content}
-            response = requests.post('{}/packages'.format(gatekeeper_address), files=files)
+            url = '{}/packages'.format(gatekeeper_address)
+            response = requests.post(url, files=files)
             if not response.ok:
                 raise Exception('Something went wrong during uploading.')
 
         # Instantiate the service
-        response = requests.post('{}/instantiations'.format(gatekeeper_address), data='{}')
+        url = '{}/instantiations'.format(gatekeeper_address)
+        response = requests.post(url, data='{}')
         if not response.ok:
             raise Exception('Something went wrong during instantiation.')
 
         instances = []
         for name, instance in self.datacenter.containers.items():
-            if name not in self.instances:
-                interfaces = [i['intf_name'] for i in instance.getNetworkStatus()]
-                instances.append(self._add_instance(name, interfaces))
+            if name in self.instances:
+                continue
+            interfaces = [i['intf_name'] for i in instance.getNetworkStatus()]
+            instances.append(self._add_instance(name, interfaces))
 
         return instances
 
@@ -138,11 +140,11 @@ class Emulator(BaseVIM):
             else:
                 image_name = image
                 image_tag = 'latest'
-            docker_url = "https://index.docker.io/v1/repositories/{}/tags/{}".format(image_name, image_tag)
-            if not requests.get(docker_url).ok:
+            url = 'https://index.docker.io/v1/repositories/{}/tags/{}'.format(image_name, image_tag)
+            if not requests.get(url).ok:
                 return False
         except docker.errors.APIError as e:
- 	    raise e
+            raise e
         return True
 
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
@@ -184,7 +186,8 @@ class Emulator(BaseVIM):
 
         return self._add_instance(name, interfaces)
 
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None, docker_command=None, **docker_build_args):
+    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
+                                 docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator
 
@@ -246,15 +249,15 @@ class Emulator(BaseVIM):
             'priority': kwargs.get('priority'),
             'endpoint': self.endpoint
         }
-        
+
         return EmuNetworkClient().add(params)
 
     def add_test_vnf(self, name, vnf_name):
         vnf = vnfs.get(vnf_name)
         if not vnf:
             raise Exception('Test vnf {} not found'.format(vnf_name))
-        
-        image =  'tango{}'.format(vnf_name)
+
+        image = 'tango{}'.format(vnf_name)
         if self._docker_image_exists(image):
             self.add_instance_from_image(name, image, vnf['interfaces'])
         else:
