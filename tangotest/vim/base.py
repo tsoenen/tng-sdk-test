@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 import json
 
+from tangotest.vnfs import vnfs
 
 class BaseVIM(object):
     __metaclass__ = ABCMeta
@@ -33,10 +34,67 @@ class BaseVIM(object):
     def stop(self):
         pass
 
+    @abstractmethod
+    def _image_exists(self, image):
+        pass
+
     def _add_instance(self, name, interfaces):
         instance = self.InstanceClass(self, name, interfaces)
         self.instances[name] = instance
         return instance
+
+    @abstractmethod
+    def add_instances_from_package(self, package, package_format=None):
+        """
+        Run VNFs using package
+
+        Args:
+            package (str): Path to the descriptor
+            package_format (str): "tango" or "sonata"
+
+        Returns:
+            list: The list of (BaseInstance)s
+        """
+        pass
+
+    @abstractmethod
+    def add_instances_from_descriptor(self, descriptor):
+        """
+        Run a VNF using its descriptor
+
+        Args:
+            vnfd (str): Path to the descriptor
+
+        Returns:
+            list: The list of (BaseInstance)s
+        """
+        pass
+
+    @abstractmethod
+    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None, **args):
+        """
+        Build and run an image on the VIM
+
+        Args:
+            name (str): The name of an instance
+            path (str): Path to the directory containing Dockerfile
+            interfaces (int) or (list): Network configuration
+
+        Returns:
+            (BaseInstance): The instance
+        """
+        pass
+
+    def add_test_vnf(self, name, vnf_name):
+        vnf = vnfs.get(vnf_name)
+        if not vnf:
+            raise Exception('Test vnf {} not found'.format(vnf_name))
+
+        image = 'tango{}'.format(vnf_name)
+        if self._image_exists(image):
+            self.add_instance_from_image(name, image, vnf['interfaces'])
+        else:
+            self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
 
     @abstractmethod
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
@@ -69,10 +127,6 @@ class BaseVIM(object):
             return True
         else:
             return False
-
-    @abstractmethod
-    def add_test_vnf(self, name, vnf_name):
-        pass
 
     def get_traffic(self, src_vnf, src_if, dst_vnf, dst_if):
         """
@@ -110,6 +164,19 @@ class BaseInstance(object):
 
     __metaclass__ = ABCMeta
 
+    @abstractmethod
+    def execute(self, cmd, stream=False, **kwargs):
+        """
+        Execute a command or script on the instance
+
+        Args:
+            cmd (str): The command or path to the script
+
+        Returns:
+            (str): stdout and stderr
+        """
+        pass
+
     def get_ip(self, interface):
         """
         Get IP address of an interface
@@ -135,21 +202,29 @@ class BaseInstance(object):
                 return ip
 
     def get_file(self, path):
+        """
+        Get file content
+
+        Args:
+            path (str): A path to the file
+
+        Returns:
+            (str): The content of the file
+        """
         cmd = 'cat {}'.format(path)
         code, output = self.execute(cmd=cmd)
         if code != 0:
             raise IOError('No such file or directory: \'{}\''.format(path))
         return output
 
-    def get_stdout(self):
-        pass
+    def get_journal(self, params):
+        """
+        Get records from systemd journal
 
-    def get_stderr(self):
-        pass
+        Args:
+            params (str): Parameters of the request
 
-    def get_jounalctl(self, params):
-        pass
-
-    @abstractmethod
-    def execute(self, cmd, stream=False, **kwargs):
+        Returns:
+            (list): List of records
+        """
         pass

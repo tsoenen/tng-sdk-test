@@ -12,7 +12,6 @@ from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
 from emuvim.api.sonata import SonataDummyGatekeeperEndpoint
 from emuvim.api.tango import TangoLLCMEndpoint
 
-from tangotest.vnfs import vnfs
 from tangotest.vim.base import BaseVIM, BaseInstance
 from tangotest.utils import get_free_tcp_port
 
@@ -69,6 +68,22 @@ class Emulator(BaseVIM):
         self.rest_api.stop()
         self.net.stop()
 
+    def _image_exists(self, image):
+        try:
+            self.docker_client.images.get(image)
+        except docker.errors.ImageNotFound:
+            if ':' in image:
+                image_name, image_tag = image.split(':')
+            else:
+                image_name = image
+                image_tag = 'latest'
+            url = 'https://index.docker.io/v1/repositories/{}/tags/{}'.format(image_name, image_tag)
+            if not requests.get(url).ok:
+                return False
+        except docker.errors.APIError as e:
+            raise e
+        return True
+
     def add_instances_from_package(self, package, package_format=None):
         """
         Run VNFs using 5GTANGO package
@@ -116,7 +131,7 @@ class Emulator(BaseVIM):
 
         return instances
 
-    def add_instances_from_vnfd(self, vnfd):
+    def add_instances_from_descriptor(self, descriptor):
         """
         Run a VNF using its descriptor
 
@@ -127,25 +142,6 @@ class Emulator(BaseVIM):
             list: The list of (EmulatorInstance)s
         """
         raise Exception('Not implemented yet')
-
-        if not os.path.isfile(vnfd):
-            raise Exception('VNFD {} not found'.format(vnfd))
-
-    def _docker_image_exists(self, image):
-        try:
-            self.docker_client.images.get(image)
-        except docker.errors.ImageNotFound:
-            if ':' in image:
-                image_name, image_tag = image.split(':')
-            else:
-                image_name = image
-                image_tag = 'latest'
-            url = 'https://index.docker.io/v1/repositories/{}/tags/{}'.format(image_name, image_tag)
-            if not requests.get(url).ok:
-                return False
-        except docker.errors.APIError as e:
-            raise e
-        return True
 
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
         """
@@ -161,7 +157,7 @@ class Emulator(BaseVIM):
             (EmulatorInstance): The instance
         """
 
-        if not self._docker_image_exists(image):
+        if not self._image_exists(image):
             raise Exception('Docker image {} not found'.format(image))
 
         if not interfaces:
@@ -251,17 +247,6 @@ class Emulator(BaseVIM):
         }
 
         return EmuNetworkClient().add(params)
-
-    def add_test_vnf(self, name, vnf_name):
-        vnf = vnfs.get(vnf_name)
-        if not vnf:
-            raise Exception('Test vnf {} not found'.format(vnf_name))
-
-        image = 'tango{}'.format(vnf_name)
-        if self._docker_image_exists(image):
-            self.add_instance_from_image(name, image, vnf['interfaces'])
-        else:
-            self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
 
 
 class EmulatorInstance(BaseInstance):
