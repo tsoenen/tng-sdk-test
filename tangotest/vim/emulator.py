@@ -59,9 +59,6 @@ class Emulator(BaseVIM):
         self.net.start()
 
     def stop(self):
-        for instance in self.instances.values():
-            instance.stop()
-
         for image in self.built_images:
             self.docker_client.images.remove(image=image)
 
