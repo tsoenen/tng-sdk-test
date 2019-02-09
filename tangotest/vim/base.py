@@ -35,6 +35,7 @@ import json
 
 from tangotest.vnfs import vnfs
 
+
 class BaseVIM(object):
     """
     This is a base class for interaction with a virtual infrastructure manager.
@@ -119,7 +120,6 @@ class BaseVIM(object):
             list: The list of the added (BaseInstance)s
         """
         pass
-
 
     @abstractmethod
     def add_instance_from_image(self, name, image, interfaces=None, **args):
@@ -269,7 +269,8 @@ class BaseInstance(object):
             interface (int) or (str): A number or name of the interface
 
         Returns:
-            (str) or (None): The IP address of the interface or None if the instance don't have this interface or if the interface has no IP address
+            (str) or (None): The IP address of the interface or None if the interface doen't exist
+                             or if the interface has no IP address
         """
 
         if isinstance(interface, int):

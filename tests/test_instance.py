@@ -23,7 +23,7 @@ def test_get_file(vnf):
     cmd = 'echo "hello\nworld" > test.txt'
     vnf.execute(cmd)
     assert 'hello\nworld' == vnf.get_file('test.txt').strip()
-    
+
 
 @pytest.mark.skip(reason="TODO")
 def test_get_journal(vnf):

@@ -15,5 +15,3 @@ def vnf(vim):
     image = 'ubuntu:trusty'
     instance = vim.add_instance_from_image(name=name, image=image)
     return instance
-
-

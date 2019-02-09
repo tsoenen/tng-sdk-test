@@ -3,29 +3,11 @@ import time
 
 
 @pytest.mark.parametrize('package,package_format,expected_instances', [
-    ('./packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango',
-        [{
-            'name': 'vnf0.vdu01',
-            'interfaces': ['input', 'output', 'mgmt']
-        }, {
-            'name': 'vnf1.vdu01',
-            'interfaces': ['input', 'output', 'mgmt']
-        }]
-    ),
-    ('./packages/eu.sonata.emulator-example-service.0.1.son', 'sonata',
-        [{
-            'name': 'empty_vnf1',
-            'interfaces': ['input', 'output', 'mgmt']
-        }, {
-            'name': 'empty_vnf2',
-            'interfaces': ['input', 'output', 'mgmt']
-        }, {
-            'name': 'empty_vnf3',
-            'interfaces': ['input', 'output', 'mgmt']
-        }]
-    )
+    ('./packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango', ['vnf0.vdu01', 'vnf1.vdu01']),
+    ('./packages/eu.sonata.emulator-example-service.0.1.son', 'sonata', ['empty_vnf1', 'empty_vnf2', 'empty_vnf3']),
 ])
 def test_add_instances_from_package(vim, package, package_format, expected_instances):
+    expected_interfaces = ['input', 'output', 'mgmt']
     actual_instances = vim.add_instances_from_package(package=package, package_format=package_format)
 
     assert len(actual_instances) == len(expected_instances)
@@ -35,9 +17,9 @@ def test_add_instances_from_package(vim, package, package_format, expected_insta
     for i in range(len(expected_instances)):
         actual_instance = actual_instances[i]
         expected_instance = expected_instances[i]
-        assert actual_instance.name == expected_instance['name']
- 
-        for interface in expected_instance['interfaces']:
+        assert actual_instance.name == expected_instance
+
+        for interface in expected_interfaces:
             cmd = 'cat /sys/class/net/{}/operstate'.format(interface)
             exec_code, exec_output = actual_instance.execute(cmd)
             assert exec_code == 0
@@ -129,4 +111,3 @@ def test_get_traffic(vim):
     traffic_end = vim.get_traffic(name1, 'cp0', name2, 'cp0')
 
     assert len(traffic_start) < len(traffic_end)
-
