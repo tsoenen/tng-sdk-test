@@ -1,4 +1,5 @@
 docker
 requests
+ipaddress
 git+https://osm.etsi.org/gerrit/osm/vim-emu.git
 git+https://github.com/containernet/containernet.git
