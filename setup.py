@@ -45,7 +45,11 @@ setup(
     author='Askhat Nuriddinov',
     author_email='askhat.nuriddinov@ugent.be',
     packages=find_packages(),
-    install_requires=[],
+    install_requires=[
+        'docker',
+        'requests',
+        'emuvim @ https://osm.etsi.org/gitweb/?p=osm/vim-emu.git',
+    ],
     include_package_data=True,
     zip_safe=False,
 )
