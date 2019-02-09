@@ -39,7 +39,7 @@ from tangotest.vnfs import vnfs
 class BaseVIM(object):
     """
     This is a base class for interaction with a virtual infrastructure manager.
-    It should be subclassed for each platform and cannot be used directly.
+    It can not be used directly and must be subclassed for each platform.
     """
     __metaclass__ = ABCMeta
 
@@ -51,7 +51,7 @@ class BaseVIM(object):
     def __init__(self):
         """
         This method must be called by subclasses to perform library-specific initialization and
-        augmented with platform-specific initialization.
+        augmented with a platform-specific initialization.
         """
         self.instances = {}
 
@@ -71,21 +71,24 @@ class BaseVIM(object):
     @abstractmethod
     def start(self):
         """
-        Run the VIM or connect to the running VIM
+        Run the VIM or connect to the running VIM.
         """
         pass
 
     @abstractmethod
     def stop(self):
         """
-        Stop the VIM or disconnect from it
+        Stop the VIM or disconnect from it.
         """
         pass
 
     @abstractmethod
     def _image_exists(self, image):
         """
-        Check whether specified image is available on the VIM
+        Check whether specified image is available on the VIM.
+
+        Args:
+            image (str): The name of the image
         """
         pass
 
@@ -97,10 +100,11 @@ class BaseVIM(object):
     @abstractmethod
     def add_instances_from_package(self, package, package_format=None):
         """
-        Run VNFs using a package
+        Run VNFs using a package.
+        The library will run all the VNFs from the package and connect the according to the descriptors.
 
         Args:
-            package (str): The path to the descriptor
+            package (str): The path to the package
             package_format (str): "tango" or "sonata"
 
         Returns:
@@ -111,7 +115,7 @@ class BaseVIM(object):
     @abstractmethod
     def add_instances_from_descriptor(self, descriptor):
         """
-        Run a VNF using its descriptor
+        Run a VNF using its descriptor.
 
         Args:
             vnfd (str): The path to the descriptor
@@ -124,14 +128,13 @@ class BaseVIM(object):
     @abstractmethod
     def add_instance_from_image(self, name, image, interfaces=None, **args):
         """
-        Run a Docker image on the Emulator
+        Run an image.
 
         Args:
             name (str): The name of an instance
             image (str): The name of an image
             interfaces (int) or (list): Network configuration
-            docker_command (str): The command to execute when starting the image
-            **args: Platform-specific parameters
+            args: Platform-specific parameters
 
         Returns:
             (BaseInstance): The added instance
@@ -141,14 +144,14 @@ class BaseVIM(object):
     @abstractmethod
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None, **args):
         """
-        Build and run an image on the VIM
+        Build and run an image on the VIM.
 
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
             interfaces (int) or (list): Network configuration
             permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
-            **args: Platform-specific parameters
+            args: Platform-specific parameters
 
         Returns:
             (BaseInstance): The added instance
@@ -157,7 +160,7 @@ class BaseVIM(object):
 
     def add_test_vnf(self, name, vnf_name):
         """
-        Add addtitional test VNFs
+        Add addtitional test VNFs.
 
         Args:
             name (str): The name of an instance
@@ -179,7 +182,7 @@ class BaseVIM(object):
     @abstractmethod
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
         """
-        Add a link between two instances
+        Add a link between two instances.
 
         Args:
             src_vnf (str): The name of a source VNF
@@ -210,7 +213,7 @@ class BaseVIM(object):
 
     def get_traffic(self, src_vnf, src_if, dst_vnf, dst_if):
         """
-        Get sniffed traffic
+        Get sniffed traffic.
 
         Args:
             src_vnf (str): The name of a source VNF
@@ -241,7 +244,7 @@ class BaseVIM(object):
 
 class BaseInstance(object):
     """
-    A representation of an abstract instance.
+    A representation of the abstract instance.
     Must be subclassed for each platform.
     Should not be created manually but by the VIM adapter.
     """
@@ -251,7 +254,7 @@ class BaseInstance(object):
     @abstractmethod
     def execute(self, cmd, stream=False, **kwargs):
         """
-        Execute a command or script on the instance
+        Execute a command or script on the instance.
 
         Args:
             cmd (str): The command or path to the script
@@ -263,7 +266,7 @@ class BaseInstance(object):
 
     def get_ip(self, interface):
         """
-        Get an IP address of an interface
+        Get an IP address of an interface.
 
         Args:
             interface (int) or (str): A number or name of the interface
@@ -290,7 +293,7 @@ class BaseInstance(object):
 
     def get_file(self, path):
         """
-        Get file content
+        Get file content.
 
         Args:
             path (str): A path to the file
@@ -306,7 +309,7 @@ class BaseInstance(object):
 
     def get_journal(self, params):
         """
-        Get records from systemd journal
+        Get records from systemd journal.
 
         Args:
             params (str): Parameters of the request

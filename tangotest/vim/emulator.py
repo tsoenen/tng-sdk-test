@@ -34,7 +34,6 @@ import os
 import docker
 import requests
 
-
 if not os.environ.get('TANGOTEST_BUILDING_DOCUMENTATION'):
     from mininet.node import RemoteController
 
@@ -186,7 +185,7 @@ class Emulator(BaseVIM):
 
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
         """
-        Run a Docker image on the Emulator
+        Run a Docker image on the Emulator.
 
         Args:
             name (str): The name of an instance
@@ -226,7 +225,7 @@ class Emulator(BaseVIM):
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
                                  docker_command=None, **docker_build_args):
         """
-        Build and run a Docker image on the Emulator
+        Build and run a Docker image on the Emulator.
 
         Args:
             name (str): The name of an instance
@@ -286,7 +285,7 @@ class EmulatorInstance(BaseInstance):
 
     def __init__(self, vim, name, interfaces):
         """
-        Initialize the instance
+        Initialize the instance.
 
         Args:
             name (str): The name of an instance
