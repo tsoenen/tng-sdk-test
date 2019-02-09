@@ -34,15 +34,17 @@ import os
 import docker
 import requests
 
-from mininet.node import RemoteController
 
-from emuvim.cli.rest.compute import RestApiClient as EmuComputeClient
-from emuvim.cli.rest.network import RestApiClient as EmuNetworkClient
+if not os.environ.get('TANGOTEST_BUILDING_DOCUMENTATION'):
+    from mininet.node import RemoteController
 
-from emuvim.dcemulator.net import DCNetwork
-from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
-from emuvim.api.sonata import SonataDummyGatekeeperEndpoint
-from emuvim.api.tango import TangoLLCMEndpoint
+    from emuvim.cli.rest.compute import RestApiClient as EmuComputeClient
+    from emuvim.cli.rest.network import RestApiClient as EmuNetworkClient
+
+    from emuvim.dcemulator.net import DCNetwork
+    from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
+    from emuvim.api.sonata import SonataDummyGatekeeperEndpoint
+    from emuvim.api.tango import TangoLLCMEndpoint
 
 from tangotest.vim.base import BaseVIM, BaseInstance
 from tangotest.utils import get_free_tcp_port

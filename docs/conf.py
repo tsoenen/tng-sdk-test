@@ -10,6 +10,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
+os.environ['TANGOTEST_BUILDING_DOCUMENTATION'] = 'true'
 
 # -- Project information -----------------------------------------------------
 
