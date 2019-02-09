@@ -1,0 +1,4 @@
+docker
+requests
+git+https://osm.etsi.org/gerrit/osm/vim-emu.git
+

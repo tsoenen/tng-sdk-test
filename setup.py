@@ -34,7 +34,7 @@ from setuptools import setup, find_packages
 
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(
@@ -45,11 +45,6 @@ setup(
     author='Askhat Nuriddinov',
     author_email='askhat.nuriddinov@ugent.be',
     packages=find_packages(),
-    install_requires=[
-        'docker',
-        'requests',
-        'emuvim @ https://osm.etsi.org/gitweb/?p=osm/vim-emu.git',
-    ],
     include_package_data=True,
     zip_safe=False,
 )
