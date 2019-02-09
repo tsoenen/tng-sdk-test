@@ -49,7 +49,30 @@ from tangotest.utils import get_free_tcp_port
 
 
 class Emulator(BaseVIM):
+    """
+    This class can be used to run tests on the VIM-EMU emulator.
+    In order to use this class you need VIM-EMU to be installed locally.
+    More information about VIM-EMU and installation instructions can be found on the project wiki-page:
+    https://osm.etsi.org/wikipub/index.php/VIM_emulator
+
+    Example:
+        >>> from tangotest.vim.emulator import Emulator
+        >>> vim = Emulator()
+        >>> vim.start()
+        >>> /* your code here */
+        >>> vim.stop()
+
+        You can also use this class with the context manager:
+
+        >>> with Emulator() as vim:
+        >>>      /* your code here */
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the Emulator.
+        This method doesn't start the Emulator.
+        """
         super(Emulator, self).__init__(*args, **kwargs)
         self.built_images = []
 
@@ -58,6 +81,9 @@ class Emulator(BaseVIM):
         return EmulatorInstance
 
     def start(self):
+        """
+        Run the Emulator and the endpoints.
+        """
         super(Emulator, self).start()
 
         self.docker_client = docker.from_env()
@@ -91,6 +117,9 @@ class Emulator(BaseVIM):
         self.net.start()
 
     def stop(self):
+        """
+        Stop the Emulator and the endpoints.
+        """
         for image in self.built_images:
             self.docker_client.images.remove(image=image)
 
@@ -114,16 +143,6 @@ class Emulator(BaseVIM):
         return True
 
     def add_instances_from_package(self, package, package_format=None):
-        """
-        Run VNFs using 5GTANGO package
-
-        Args:
-            package (str): Path to a descriptor
-            package_format (str): "tango" or "sonata"
-
-        Returns:
-            list: The list of (EmulatorInstance)s
-        """
         if not os.path.isfile(package):
             raise Exception('Package {} not found'.format(package))
 
@@ -161,15 +180,6 @@ class Emulator(BaseVIM):
         return instances
 
     def add_instances_from_descriptor(self, descriptor):
-        """
-        Run a VNF using its descriptor
-
-        Args:
-            vnfd (str): Path to a descriptor
-
-        Returns:
-            list: The list of (EmulatorInstance)s
-        """
         raise Exception('Not implemented yet')
 
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
@@ -178,12 +188,12 @@ class Emulator(BaseVIM):
 
         Args:
             name (str): The name of an instance
-            image (str): The image to instatiate
+            image (str): The name of an image
             interfaces (int) or (list): Network configuration
-            docker_command (str): The command to execute when running the image
+            docker_command (str): The command to execute when starting the instance
 
         Returns:
-            (EmulatorInstance): The instance
+            (EmulatorInstance): The added instance
         """
 
         if not self._image_exists(image):
@@ -218,12 +228,14 @@ class Emulator(BaseVIM):
 
         Args:
             name (str): The name of an instance
-            path (str): Path to the directory containing Dockerfile
+            path (str): The path to the directory containing Dockerfile
             interfaces (int) or (list): Network configuration
-            docker_command (str): The command to execute when running the image
+            permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
+            docker_command (str): The command to execute when starting the instance
+            **docker_build_args: Extra arguments to be used by the Docker engine to build the image
 
         Returns:
-            (EmulatorInstance): The instance
+            (EmulatorInstance): The added instance
         """
 
         if path[-1] != '/':
@@ -245,20 +257,6 @@ class Emulator(BaseVIM):
         return self.add_instance_from_image(name, tag, interfaces)
 
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
-        """
-        Add link between two instances
-
-        Args:
-            src_vnf (str): The name of a source VNF
-            src_if (str): The name of an interface of a source VNF
-            dst_vnf (str): The name of a destination VNF
-            dst_if (str): The name of an interface of a destination VNF
-            sniff (bool): Add sniffer to the link
-
-        Returns:
-            (bool): ''True'' if successfull
-        """
-
         result = super(Emulator, self).add_link(src_vnf, src_if, dst_vnf, dst_if, sniff, **kwargs)
 
         if result:
@@ -279,17 +277,30 @@ class Emulator(BaseVIM):
 
 
 class EmulatorInstance(BaseInstance):
+    """
+    A representation of an instance on the Emulator.
+    Should not be created manually but by the Emulator class.
+    """
+
     def __init__(self, vim, name, interfaces):
+        """
+        Initialize the instance
+
+        Args:
+            name (str): The name of an instance
+            path (str): The path to the directory containing Dockerfile
+            interfaces (list): Network configuration
+
+        Returns:
+            (bool): True
+        """
         self.vim = vim
         self.name = name
         self.docker_client = self.vim.docker_client
         self.container = self.docker_client.containers.get('mn.{}'.format(name))
         self.interfaces = interfaces
         self.output = None
+        return True
 
     def execute(self, cmd, stream=False, **kwargs):
         return self.container.exec_run(cmd=['sh', '-c', cmd], stream=stream, **kwargs)
-
-    def stop(self):
-        self.container.kill()
-        self.container.remove()

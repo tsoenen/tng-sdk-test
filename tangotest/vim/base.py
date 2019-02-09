@@ -36,13 +36,22 @@ import json
 from tangotest.vnfs import vnfs
 
 class BaseVIM(object):
+    """
+    This is a base class for interaction with a virtual infrastructure manager.
+    It should be subclassed for each platform and cannot be used directly.
+    """
     __metaclass__ = ABCMeta
 
     @abstractproperty
     def InstanceClass(self):
         pass
 
+    @abstractmethod
     def __init__(self):
+        """
+        This method must be called by subclasses to perform library-specific initialization and
+        augmented with platform-specific initialization.
+        """
         self.instances = {}
 
     def __getattr__(self, name):
@@ -60,14 +69,23 @@ class BaseVIM(object):
 
     @abstractmethod
     def start(self):
+        """
+        Run the VIM or connect to the running VIM
+        """
         pass
 
     @abstractmethod
     def stop(self):
+        """
+        Stop the VIM or disconnect from it
+        """
         pass
 
     @abstractmethod
     def _image_exists(self, image):
+        """
+        Check whether specified image is available on the VIM
+        """
         pass
 
     def _add_instance(self, name, interfaces):
@@ -78,10 +96,10 @@ class BaseVIM(object):
     @abstractmethod
     def add_instances_from_package(self, package, package_format=None):
         """
-        Run VNFs using package
+        Run VNFs using a package
 
         Args:
-            package (str): Path to the descriptor
+            package (str): The path to the descriptor
             package_format (str): "tango" or "sonata"
 
         Returns:
@@ -95,10 +113,28 @@ class BaseVIM(object):
         Run a VNF using its descriptor
 
         Args:
-            vnfd (str): Path to the descriptor
+            vnfd (str): The path to the descriptor
 
         Returns:
-            list: The list of (BaseInstance)s
+            list: The list of the added (BaseInstance)s
+        """
+        pass
+
+
+    @abstractmethod
+    def add_instance_from_image(self, name, image, interfaces=None, **args):
+        """
+        Run a Docker image on the Emulator
+
+        Args:
+            name (str): The name of an instance
+            image (str): The name of an image
+            interfaces (int) or (list): Network configuration
+            docker_command (str): The command to execute when starting the image
+            **args: Platform-specific parameters
+
+        Returns:
+            (BaseInstance): The added instance
         """
         pass
 
@@ -109,36 +145,48 @@ class BaseVIM(object):
 
         Args:
             name (str): The name of an instance
-            path (str): Path to the directory containing Dockerfile
+            path (str): The path to the directory containing Dockerfile
             interfaces (int) or (list): Network configuration
+            permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
+            **args: Platform-specific parameters
 
         Returns:
-            (BaseInstance): The instance
+            (BaseInstance): The added instance
         """
         pass
 
     def add_test_vnf(self, name, vnf_name):
+        """
+        Add addtitional test VNFs
+
+        Args:
+            name (str): The name of an instance
+            vnf_name (str): The name of the VNF
+
+        Returns:
+            (BaseInstance): The added instance
+        """
         vnf = vnfs.get(vnf_name)
         if not vnf:
             raise Exception('Test vnf {} not found'.format(vnf_name))
 
         image = 'tango{}'.format(vnf_name)
         if self._image_exists(image):
-            self.add_instance_from_image(name, image, vnf['interfaces'])
+            return self.add_instance_from_image(name, image, vnf['interfaces'])
         else:
-            self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
+            return self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
 
     @abstractmethod
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
         """
-        Add link between two instances
+        Add a link between two instances
 
         Args:
             src_vnf (str): The name of a source VNF
-            src_if (str): The name of an interface of a source VNF
+            src_if (str): The name of a source interface
             dst_vnf (str): The name of a destination VNF
-            dst_if (str): The name of an interface of a destination VNF
-            sniff (bool): Add sniffer to the link
+            dst_if (str): The name of a destination interface
+            sniff (bool): Add the sniffer to the link
 
         Returns:
             (bool): ''True'' if successfull
@@ -192,7 +240,11 @@ class BaseVIM(object):
 
 
 class BaseInstance(object):
-    """A representation of an Emulator instance"""
+    """
+    A representation of an abstract instance.
+    Must be subclassed for each platform.
+    Should not be created manually but by the VIM adapter.
+    """
 
     __metaclass__ = ABCMeta
 
@@ -205,19 +257,19 @@ class BaseInstance(object):
             cmd (str): The command or path to the script
 
         Returns:
-            (str): stdout and stderr
+            (str): Output of the executed command or script
         """
         pass
 
     def get_ip(self, interface):
         """
-        Get IP address of an interface
+        Get an IP address of an interface
 
         Args:
-            interface (int) or (str): Number or name of the interface
+            interface (int) or (str): A number or name of the interface
 
         Returns:
-            (str) or (None): IP address of an interface or None if an interface has no IP address
+            (str) or (None): The IP address of the interface or None if the instance don't have this interface or if the interface has no IP address
         """
 
         if isinstance(interface, int):
@@ -232,6 +284,8 @@ class BaseInstance(object):
                 raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
             else:
                 return ip
+        else:
+            raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
 
     def get_file(self, path):
         """
@@ -257,6 +311,6 @@ class BaseInstance(object):
             params (str): Parameters of the request
 
         Returns:
-            (list): List of records
+            (list): The list of records
         """
         pass
