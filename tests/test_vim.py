@@ -1,14 +1,19 @@
 import pytest
 import time
+import inspect, os
 
 
 @pytest.mark.parametrize('package,package_format,expected_instances', [
-    ('./packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango', ['vnf0.vdu01', 'vnf1.vdu01']),
-    ('./packages/eu.sonata.emulator-example-service.0.1.son', 'sonata', ['empty_vnf1', 'empty_vnf2', 'empty_vnf3']),
+    ('/packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango', ['vnf0.vdu01', 'vnf1.vdu01']),
+    ('/packages/eu.sonata.emulator-example-service.0.1.son', 'sonata', ['empty_vnf1', 'empty_vnf2', 'empty_vnf3']),
 ])
 def test_add_instances_from_package(vim, package, package_format, expected_instances):
     expected_interfaces = ['input', 'output', 'mgmt']
-    actual_instances = vim.add_instances_from_package(package=package, package_format=package_format)
+
+    test_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    path = test_dir + package
+
+    actual_instances = vim.add_instances_from_package(package=path, package_format=package_format)
 
     assert len(actual_instances) == len(expected_instances)
 
@@ -49,7 +54,8 @@ def test_add_instance_from_image(vim, interfaces, expected_interfaces):
 
 def test_add_instance_from_source(vim):
     name = 'tangotest_test'
-    path = './vnfs/empty'
+    test_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    path = test_dir + '/vnfs/empty'
     interface = 'cp0'
     instance = vim.add_instance_from_source(name=name, path=path)
     cmd = 'cat /sys/class/net/{}/operstate'.format(interface)
