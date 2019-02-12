@@ -49,7 +49,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
-        'docker',
+        'docker>=3.7.0',
     ],
     zip_safe=False,
 )
