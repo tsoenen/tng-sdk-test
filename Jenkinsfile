@@ -27,7 +27,7 @@ pipeline {
                 sh "pipeline/publish.sh"
             }
         }
-        stage('Publication') {
+        stage('Cleaning') {
             steps {
                 echo 'Stage: Cleaning...'
                 sh "pipeline/clean.sh"
