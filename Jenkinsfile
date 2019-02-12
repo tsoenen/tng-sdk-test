@@ -30,10 +30,6 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Stage: Cleaning...'
-            sh "pipeline/clean.sh"
-        }
         success {
             emailext(from: "jenkins@sonata-nfv.eu", 
             to: "askhat.nuriddinov@ugent.be", 
