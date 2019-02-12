@@ -1,5 +1,5 @@
 [![Join the chat at https://gitter.im/sonata-nfv/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sonata-nfv/Lobby)
-[![Documentation Status](https://readthedocs.org/projects/tng-sdk-test/badge/?version=latest)](https://tng-sdk-test.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/tng-sdk-test/badge/?version=latest)](https://tng-sdk-test.readthedocs.io/en/latest/?badge=latest)[![Build Status](https://jenkins.sonata-nfv.eu/buildStatus/icon?job=tng-sdk-test-pipeline/master)](https://jenkins.sonata-nfv.eu/job/tng-sdk-test-pipeline/job/master/)
 
 <p align="center"><img src="https://github.com/sonata-nfv/tng-api-gtw/wiki/images/sonata-5gtango-logo-500px.png" /></p>
 
