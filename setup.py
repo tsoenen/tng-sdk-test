@@ -46,5 +46,9 @@ setup(
     author_email='askhat.nuriddinov@ugent.be',
     packages=find_packages(),
     include_package_data=True,
+    install_requires=[
+        'requests',
+        'docker',
+    ],
     zip_safe=False,
 )
