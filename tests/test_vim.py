@@ -67,7 +67,6 @@ def test_add_link(vim, add_link, expected_exec_code):
 
     name1 = 'tangotest_test1'
     instance1 = vim.add_instance_from_image(name=name1, image=image)
-    instance1_ip = instance1.get_ip(0)
 
     name2 = 'tangotest_test2'
     instance2 = vim.add_instance_from_image(name=name2, image=image)
@@ -94,7 +93,6 @@ def test_get_traffic(vim):
 
     name1 = 'tangotest_test1'
     instance1 = vim.add_instance_from_image(name=name1, image=image)
-    instance1_ip = instance1.get_ip(0)
 
     name2 = 'tangotest_test2'
     instance2 = vim.add_instance_from_image(name=name2, image=image)
