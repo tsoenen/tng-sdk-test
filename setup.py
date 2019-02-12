@@ -50,6 +50,7 @@ setup(
     install_requires=[
         'requests',
         'docker>=3.7.0',
+        'more-itertools<=5.0.0',
     ],
     zip_safe=False,
 )
