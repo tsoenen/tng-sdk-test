@@ -27,15 +27,13 @@ pipeline {
                 sh "pipeline/publish.sh"
             }
         }
-        stage('Cleaning') {
-            steps {
-                echo 'Stage: Cleaning...'
-                sh "pipeline/clean.sh"
-            }
-        }
     }
 
     post {
+        always {
+            echo 'Stage: Cleaning...'
+            sh "pipeline/clean.sh"
+        }
         success {
             emailext(from: "jenkins@sonata-nfv.eu", 
             to: "askhat.nuriddinov@ugent.be", 
