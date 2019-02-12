@@ -121,11 +121,11 @@ class Emulator(BaseVIM):
         """
         Stop the Emulator and the endpoints.
         """
-        for image in self.built_images:
-            self.docker_client.images.remove(image=image)
-
         self.rest_api.stop()
         self.net.stop()
+
+        for image in self.built_images:
+            self.docker_client.images.remove(image=image)
 
     def _image_exists(self, image):
         try:
@@ -291,9 +291,6 @@ class EmulatorInstance(BaseInstance):
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
             interfaces (list): Network configuration
-
-        Returns:
-            (bool): True
         """
         self.vim = vim
         self.name = name
@@ -301,7 +298,6 @@ class EmulatorInstance(BaseInstance):
         self.container = self.docker_client.containers.get('mn.{}'.format(name))
         self.interfaces = interfaces
         self.output = None
-        return True
 
     def execute(self, cmd, stream=False, **kwargs):
         return self.container.exec_run(cmd=['sh', '-c', cmd], stream=stream, **kwargs)
