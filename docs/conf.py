@@ -10,8 +10,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-os.environ['TANGOTEST_BUILDING_DOCUMENTATION'] = 'true'
-
 # -- Project information -----------------------------------------------------
 
 project = u'tangotest'
@@ -180,3 +178,4 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+autodoc_mock_imports = ['emuvim', 'mininet']
