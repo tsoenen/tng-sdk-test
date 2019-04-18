@@ -195,21 +195,21 @@ class BaseVIM(object):
             (bool): ''True'' if successfull
         """
 
-        if sniff:
-            sniffer_name = 'sniffer_{}_{}_{}_{}'.format(src_vnf, src_if, dst_vnf, dst_if)
-            self.add_test_vnf(sniffer_name, 'sniffer')
-
-            self.add_link(src_vnf, src_if,
-                          sniffer_name, self.instances[sniffer_name].interfaces[0],
-                          sniff=False, **kwargs)
-
-            self.add_link(sniffer_name, self.instances[sniffer_name].interfaces[1],
-                          dst_vnf, dst_if,
-                          sniff=False, **kwargs)
-
-            return True
-        else:
+        if not sniff:
             return False
+
+        sniffer_name = 'sniffer_{}_{}_{}_{}'.format(src_vnf, src_if, dst_vnf, dst_if)
+        self.add_test_vnf(sniffer_name, 'sniffer')
+
+        self.add_link(src_vnf, src_if,
+                      sniffer_name, self.instances[sniffer_name].interfaces[0],
+                      sniff=False, **kwargs)
+
+        self.add_link(sniffer_name, self.instances[sniffer_name].interfaces[1],
+                      dst_vnf, dst_if,
+                      sniff=False, **kwargs)
+
+        return True
 
     def get_traffic(self, src_vnf, src_if, dst_vnf, dst_if):
         """
@@ -272,24 +272,50 @@ class BaseInstance(object):
             interface (int) or (str): A number or name of the interface
 
         Returns:
-            (str) or (None): The IP address of the interface or None if the interface doen't exist
+            (str) or (None): The IP address of the interface or None if the interface doesn't exist
                              or if the interface has no IP address
         """
 
         if isinstance(interface, int):
             interface = self.interfaces[interface]
-        if isinstance(interface, str):
-            cmd = 'ip -4 addr show {} | grep -oP \'(?<=inet\s)\d+(\.\d+){{3}}\''.format(interface)
-            code, output = self.execute(cmd)
-
-            ip = output.strip()
-
-            if not ip:
-                raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
-            else:
-                return ip
-        else:
+        if not isinstance(interface, str):
             raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
+
+        cmd = 'ip -4 addr show {} | grep -oP \'(?<=inet\s)\d+(\.\d+){{3}}\''.format(interface)
+        code, output = self.execute(cmd)
+
+        ip = output.strip()
+
+        if not ip:
+            return None
+
+        return ip
+
+    def get_mac(self, interface):
+        """
+        Get a MAC address of an interface.
+
+        Args:
+            interface (int) or (str): A number or name of the interface
+
+        Returns:
+            (str) or (None): The MAC address of the interface or None if the interface doesn't exist
+        """
+
+        if isinstance(interface, int):
+            interface = self.interfaces[interface]
+        if not isinstance(interface, str):
+            raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
+
+        cmd = 'cat /sys/class/net/{}/address'.foramt(interface)
+        code, output = self.execute(cmd)
+
+        mac = output.strip()
+
+        if not mac:
+            return None
+
+        return ip
 
     def get_file(self, path):
         """
