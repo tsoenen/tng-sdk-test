@@ -25,5 +25,6 @@ ________________________________
 
   .. automethod:: execute
   .. automethod:: get_ip
+  .. automethod:: get_mac
   .. automethod:: get_file
   .. automethod:: get_journal
