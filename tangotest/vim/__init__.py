@@ -29,3 +29,22 @@
 # the Horizon 2020 and 5G-PPP programmes. The authors would like to
 # acknowledge the contributions of their colleagues of the SONATA
 # partner consortium (www.5gtango.eu).
+
+import os
+from contextlib import contextmanager
+
+from tangotest.vim.emulator import Emulator
+
+
+@contextmanager
+def vim_from_env():
+    if os.environ['TANGOTEST_PLATFORM'] == 'EMULATOR':
+        vim = Emulator()
+    elif os.environ['TANGOTEST_PLATFORM'] == 'EMULATOR_VNV_CHECKER':
+        vim = Emulator(vnv_checker=True)
+    else:
+        vim = Emulator()
+
+    vim.start()
+    yield vim
+    vim.stop()
