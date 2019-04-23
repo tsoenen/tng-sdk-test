@@ -44,13 +44,13 @@ from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
 from emuvim.api.sonata import SonataDummyGatekeeperEndpoint
 from emuvim.api.tango import TangoLLCMEndpoint
 
-from tangotest.vim.base import BaseVIM, BaseInstance
+from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.utils import get_free_tcp_port
 
 from tangotest.vnv_checker import vnv_called_once, vnv_not_called, vnv_called_without_parameter
 
 
-class Emulator(BaseVIM):
+class Emulator(DockerBasedVIM):
     """
     This class can be used to run tests on the VIM-EMU emulator.
     In order to use this class you need VIM-EMU to be installed locally.
@@ -70,7 +70,7 @@ class Emulator(BaseVIM):
         >>>      /* your code here */
     """
 
-    def __init__(self, vnv_checker, *args, **kwargs):
+    def __init__(self, vnv_checker=False, *args, **kwargs):
         """
         Initialize the Emulator.
         This method doesn't start the Emulator.
@@ -80,7 +80,6 @@ class Emulator(BaseVIM):
         """
         super(Emulator, self).__init__(*args, **kwargs)
         self.vnv_checker = vnv_checker
-        self.built_images = []
 
     @property
     def InstanceClass(self):
@@ -129,24 +128,7 @@ class Emulator(BaseVIM):
         self.rest_api.stop()
         self.net.stop()
 
-        for image in self.built_images:
-            self.docker_client.images.remove(image=image)
-
-    def _image_exists(self, image):
-        try:
-            self.docker_client.images.get(image)
-        except docker.errors.ImageNotFound:
-            if ':' in image:
-                image_name, image_tag = image.split(':')
-            else:
-                image_name = image
-                image_tag = 'latest'
-            url = 'https://index.docker.io/v1/repositories/{}/tags/{}'.format(image_name, image_tag)
-            if not requests.get(url).ok:
-                return False
-        except docker.errors.APIError as e:
-            raise e
-        return True
+        super(Emulator, self).stop()
 
     @vnv_called_once
     def add_instances_from_package(self, package, package_format=None):
@@ -185,9 +167,6 @@ class Emulator(BaseVIM):
             instances.append(self._add_instance(name, interfaces))
 
         return instances
-
-    def add_instances_from_descriptor(self, descriptor):
-        raise Exception('Not implemented yet')
 
     @vnv_called_without_parameter('interfaces')
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
@@ -246,24 +225,9 @@ class Emulator(BaseVIM):
         Returns:
             (EmulatorInstance): The added instance
         """
-
-        if path[-1] != '/':
-            path += '/'
-
-        if not os.path.isfile('{}Dockerfile'.format(path)):
-            raise Exception('Dockerfile in {} not found'.format(path))
-
-        if permanent_name:
-            tag = permanent_name
-        else:
-            tag = 'tangotest{}'.format(name)
-        docker_image, _ = self.docker_client.images.build(path=path, **docker_build_args)
-        docker_image.tag(tag)
-
-        if not permanent_name:
-            self.built_images.append(tag)
-
-        return self.add_instance_from_image(name, tag, interfaces)
+        return super(Emulator, self).add_instance_from_source(name, path, interfaces,
+                                                              permanent_name, docker_command,
+                                                              **docker_build_args)
 
     @vnv_not_called
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
@@ -286,13 +250,13 @@ class Emulator(BaseVIM):
         return EmuNetworkClient().add(params)
 
 
-class EmulatorInstance(BaseInstance):
+class EmulatorInstance(DockerBasedInstance):
     """
     A representation of an instance on the Emulator.
     Should not be created manually but by the Emulator class.
     """
 
-    def __init__(self, vim, name, interfaces):
+    def __init__(self, vim, name, interfaces=None):
         """
         Initialize the instance.
 
@@ -304,9 +268,6 @@ class EmulatorInstance(BaseInstance):
         self.vim = vim
         self.name = name
         self.docker_client = self.vim.docker_client
-        self.container = self.docker_client.containers.get('mn.{}'.format(name))
         self.interfaces = interfaces
         self.output = None
-
-    def execute(self, cmd, stream=False, **kwargs):
-        return self.container.exec_run(cmd=['sh', '-c', cmd], stream=stream, **kwargs)
+        self.container = self.docker_client.containers.get('mn.{}'.format(name))
