@@ -56,7 +56,7 @@ def vnv_called_without_parameter(parameter):
     def decorator(f):
         def wrapper(self, *args, **kwargs):
             if self.vnv_checker:
-                if parameter in kwargs and kwargs['parameter'] is not None:
+                if kwargs.get(parameter) is not None:
                     raise VnvError('Function {} can not be used with parameter {} on the V&V'.format(f.__name__, parameter))
             return f(self, *args, **kwargs)
         return wrapper
