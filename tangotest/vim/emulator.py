@@ -47,6 +47,8 @@ from emuvim.api.tango import TangoLLCMEndpoint
 from tangotest.vim.base import BaseVIM, BaseInstance
 from tangotest.utils import get_free_tcp_port
 
+from tangotest.vnv_checker import vnv_called_once, vnv_not_called, vnv_called_without_parameter
+
 
 class Emulator(BaseVIM):
     """
@@ -68,12 +70,16 @@ class Emulator(BaseVIM):
         >>>      /* your code here */
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, vnv_checker, *args, **kwargs):
         """
         Initialize the Emulator.
         This method doesn't start the Emulator.
+
+        Args:
+            vnv_checker (bool): Check if the code can be reused on the 5GTANGO V&V platform
         """
         super(Emulator, self).__init__(*args, **kwargs)
+        self.vnv_checker = vnv_checker
         self.built_images = []
 
     @property
@@ -142,6 +148,7 @@ class Emulator(BaseVIM):
             raise e
         return True
 
+    @vnv_called_once
     def add_instances_from_package(self, package, package_format=None):
         if not os.path.isfile(package):
             raise Exception('Package {} not found'.format(package))
@@ -182,6 +189,7 @@ class Emulator(BaseVIM):
     def add_instances_from_descriptor(self, descriptor):
         raise Exception('Not implemented yet')
 
+    @vnv_called_without_parameter('interfaces')
     def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
         """
         Run a Docker image on the Emulator.
@@ -221,6 +229,7 @@ class Emulator(BaseVIM):
 
         return self._add_instance(name, interfaces)
 
+    @vnv_called_without_parameter('interfaces')
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
                                  docker_command=None, **docker_build_args):
         """
@@ -256,6 +265,7 @@ class Emulator(BaseVIM):
 
         return self.add_instance_from_image(name, tag, interfaces)
 
+    @vnv_not_called
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
         result = super(Emulator, self).add_link(src_vnf, src_if, dst_vnf, dst_if, sniff, **kwargs)
 
