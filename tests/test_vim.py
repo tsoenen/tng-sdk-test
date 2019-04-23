@@ -31,11 +31,6 @@ def test_add_instances_from_package(vim, package, package_format, expected_insta
             assert exec_output.strip() == 'up'
 
 
-@pytest.mark.skip(reason="TODO")
-def test_add_instance_from_vnfd(vim):
-    pass
-
-
 @pytest.mark.parametrize('interfaces,expected_interfaces', [
     (None, ['cp0']),
     (3, ['cp0', 'cp1', 'cp2']),

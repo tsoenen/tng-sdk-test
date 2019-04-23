@@ -113,19 +113,6 @@ class BaseVIM(object):
         pass
 
     @abstractmethod
-    def add_instances_from_descriptor(self, descriptor):
-        """
-        Run a VNF using its descriptor.
-
-        Args:
-            vnfd (str): The path to the descriptor
-
-        Returns:
-            list: The list of the added (BaseInstance)s
-        """
-        pass
-
-    @abstractmethod
     def add_instance_from_image(self, name, image, interfaces=None, **args):
         """
         Run an image.
