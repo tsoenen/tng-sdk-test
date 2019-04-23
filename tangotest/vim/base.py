@@ -302,7 +302,7 @@ class BaseInstance(object):
         if not mac:
             return None
 
-        return ip
+        return mac
 
     def get_file(self, path):
         """
