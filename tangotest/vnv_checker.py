@@ -39,6 +39,7 @@ def vnv_not_called(f):
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
             raise VnvError('Function {} can not be used on the V&V'.format(f.__name__))
+        return f(self, *args, **kwargs)
     return wrapper
 
 def vnv_called_once(f):
@@ -47,7 +48,7 @@ def vnv_called_once(f):
             if wrapper.called:
                 raise VnvError('Function {} can be called only once on the V&V'.format(f.__name__))
             wrapper.called = True
-            return f(self, *args, **kwargs)
+        return f(self, *args, **kwargs)
     wrapper.called = False
     return wrapper
 
@@ -55,7 +56,7 @@ def vnv_called_without_parameter(parameter):
     def decorator(f):
         def wrapper(self, *args, **kwargs):
             if self.vnv_checker:
-                if parameter in kwargs:
+                if parameter in kwargs and kwargs['parameter'] is not None:
                     raise VnvError('Function {} can not be used with parameter {} on the V&V'.format(f.__name__, parameter))
             return f(self, *args, **kwargs)
         return wrapper
