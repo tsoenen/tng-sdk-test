@@ -75,7 +75,7 @@ class DockerBasedVIM(BaseVIM):
             raise e
         return True
 
-    def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
+    def add_instance_from_image(self, name, image, interfaces=None, docker_command=None, **docker_run_args):
         """
         Run a Docker image on the Emulator.
 
@@ -92,7 +92,8 @@ class DockerBasedVIM(BaseVIM):
         if not self._image_exists(image):
             raise Exception('Docker image {} not found'.format(image))
 
-        # TODO
+        self.container = self.docker_client.containers.get(name=name, image=image, command=docker_command, **docker_run_args)
+        interfaces = ['eth0']
 
         return self._add_instance(name, interfaces)
 
