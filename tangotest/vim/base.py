@@ -331,3 +331,42 @@ class BaseInstance(object):
             (list): The list of records
         """
         pass
+
+class BaseImmutableInstance(BaseInstance):
+    """
+    A representation of the abstract instance without direct access
+    Must be subclassed for each platform.
+    Should not be created manually but by the VIM adapter.
+    """
+
+    __metaclass__ = ABCMeta
+
+    def execute(self, *args, **kwargs):
+        raise Exception('Executing commands on immutable instances is not supported.')
+
+    @abstractmethod
+    def get_ip(self, interface):
+        """
+        Get an IP address of an interface.
+
+        Args:
+            interface (int) or (str): A number or name of the interface
+
+        Returns:
+            (str) or (None): The IP address of the interface or None if the interface doesn't exist
+                             or if the interface has no IP address
+        """
+        pass
+
+    @abstractmethod
+    def get_mac(self, interface):
+        """
+        Get a MAC address of an interface.
+
+        Args:
+            interface (int) or (str): A number or name of the interface
+
+        Returns:
+            (str) or (None): The MAC address of the interface or None if the interface doesn't exist
+        """
+        pass

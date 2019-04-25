@@ -34,11 +34,12 @@ import os
 import docker
 import requests
 
-from tangotest.vim.base import BaseVIM, BaseInstance
+from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
+from tangotest.vim.base import BaseImmutableInstance
 from tangotest.tangotools.package_parser import parse_package
 
 
-class Vnv(BaseVIM):
+class Vnv(DockerBasedVIM):
     @property
     def InstanceClass(self):
         return VnvInstance
@@ -61,6 +62,11 @@ class Vnv(BaseVIM):
     def add_link(self, *args, **kwargs):
         raise Exception('Network configuration is not available')
 
+    def _add_immutable_instance(self, name, interfaces):
+        instance = VnvImmutableInstanceClass(self, name, interfaces)
+        self.instances[name] = instance
+        return instance
+
 
 class VnvInstance(DockerBasedInstance):
     """
@@ -68,3 +74,43 @@ class VnvInstance(DockerBasedInstance):
     Should not be created manually but by the Vnv class.
     """
     pass
+
+
+class VnvImmutableInstance(BaseImmutableInstance):
+    """
+    A representation of an instance without direct access
+    Should not be created manually but by the Vnv class.
+    """
+    def get_ip(self, interface):
+        """
+        Get an IP address of an interface.
+
+        Args:
+            interface (int) or (str): A number or name of the interface
+
+        Returns:
+            (str) or (None): The IP address of the interface or None if the interface doesn't exist
+                             or if the interface has no IP address
+        """
+        if isinstance(interface, int):
+            interface = self.interfaces[interface]
+        if not isinstance(interface, str):
+            raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
+
+        env_name = '{}_{}'.format(self.name, interface)
+        return os.environ[env_name]
+
+
+    @abstractmethod
+    def get_mac(self, interface):
+        """
+        Get a MAC address of an interface.
+
+        Args:
+            interface (int) or (str): A number or name of the interface
+
+        Returns:
+            (str) or (None): The MAC address of the interface or None if the interface doesn't exist
+        """
+        pass
+                 
