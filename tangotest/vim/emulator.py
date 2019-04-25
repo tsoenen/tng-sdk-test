@@ -131,12 +131,9 @@ class Emulator(DockerBasedVIM):
         super(Emulator, self).stop()
 
     @vnv_called_once
-    def add_instances_from_package(self, package, package_format=None):
+    def add_instances_from_package(self, package, package_format='tango'):
         if not os.path.isfile(package):
             raise Exception('Package {} not found'.format(package))
-
-        if not package_format:
-            package_format = 'tango'
 
         if package_format == 'tango':
             gatekeeper_address = self.tango_address

@@ -43,12 +43,9 @@ class Vnv(BaseVIM):
     def InstanceClass(self):
         return VnvInstance
 
-    def add_instances_from_package(self, package, package_format=None):
+    def add_instances_from_package(self, package, package_format='tango'):
         if not os.path.isfile(package):
             raise Exception('Package {} not found'.format(package))
-
-        if not package_format:
-            package_format = 'tango'
 
         package_data = parse_package(package_format)
 
