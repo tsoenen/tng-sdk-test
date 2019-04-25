@@ -152,7 +152,7 @@ class DockerBasedInstance(BaseInstance):
         self.vim = vim
         self.name = name
         self.docker_client = self.vim.docker_client
-        self.interfaces = interfaces
+        self.interfaces = interfaces or []
         self.output = None
         self.container = self.docker_client.containers.get(name)
 
