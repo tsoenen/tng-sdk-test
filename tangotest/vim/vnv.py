@@ -31,8 +31,6 @@
 # partner consortium (www.5gtango.eu).
 
 import os
-import docker
-import requests
 
 from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.vim.base import BaseImmutableInstance
@@ -63,7 +61,7 @@ class Vnv(DockerBasedVIM):
         raise Exception('Network configuration is not available')
 
     def _add_immutable_instance(self, name, interfaces):
-        instance = VnvImmutableInstanceClass(self, name, interfaces)
+        instance = VnvImmutableInstance(self, name, interfaces)
         self.instances[name] = instance
         return instance
 
@@ -100,8 +98,6 @@ class VnvImmutableInstance(BaseImmutableInstance):
         env_name = '{}_{}'.format(self.name, interface)
         return os.environ[env_name]
 
-
-    @abstractmethod
     def get_mac(self, interface):
         """
         Get a MAC address of an interface.
@@ -113,4 +109,3 @@ class VnvImmutableInstance(BaseImmutableInstance):
             (str) or (None): The MAC address of the interface or None if the interface doesn't exist
         """
         pass
-                 

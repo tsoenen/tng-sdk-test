@@ -332,6 +332,7 @@ class BaseInstance(object):
         """
         pass
 
+
 class BaseImmutableInstance(BaseInstance):
     """
     A representation of the abstract instance without direct access

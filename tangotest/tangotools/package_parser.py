@@ -1,6 +1,5 @@
 import zipfile
 import yaml
-from collections import OrderedDict
 
 
 def parse_package(package_path, package_format='tango'):
@@ -9,7 +8,8 @@ def parse_package(package_path, package_format='tango'):
     else:
         raise Exception('Specified unsupported package_format {}. Supported formats: tango.'.format(package_format))
 
-def parse_tango_package(package_path)
+
+def parse_tango_package(package_path):
     # TODO: parametrize function type (virtual, cloud)
 
     result = {}
@@ -41,7 +41,7 @@ def parse_tango_package(package_path)
         nf_id = nf['vnf_id']
         nfd = nfds[nf_name]
         external_nf_cps = [cp.split(':')[1] for cp in external_nfs_cps if cp.split(':')[0] == nf_id]
-        nf_virtual_links = [vl['connection_points_reference'] for vl in nfd['virtual_links']]        
+        nf_virtual_links = [vl['connection_points_reference'] for vl in nfd['virtual_links']]
         external_nf_virtual_links = [vl for vl in nf_virtual_links if set(vl) & set(external_nf_cps)]
         external_dus_cps = list(set(sum(external_nf_virtual_links, [])).difference(external_nf_cps))
         result[nf_name] = {}
@@ -49,6 +49,5 @@ def parse_tango_package(package_path)
             du_name = du['id']
             external_du_cps = [cp.split(':')[1] for cp in external_dus_cps if cp.split(':')[0] == du_name]
             result[nf_name][du_name] = external_du_cps
-            
-    return result
 
+    return result

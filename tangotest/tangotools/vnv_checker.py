@@ -30,9 +30,10 @@
 # acknowledge the contributions of their colleagues of the SONATA
 # partner consortium (www.5gtango.eu).
 
+
 class VnvError(Exception):
-   """Raised by the Emulator class when vnv_checker is set and test failed"""
-   pass
+    """Raised by the Emulator class when vnv_checker is set and test failed"""
+    pass
 
 
 def vnv_not_called(f):
@@ -41,6 +42,7 @@ def vnv_not_called(f):
             raise VnvError('Function {} can not be used on the V&V'.format(f.__name__))
         return f(self, *args, **kwargs)
     return wrapper
+
 
 def vnv_called_once(f):
     def wrapper(self, *args, **kwargs):
@@ -51,6 +53,7 @@ def vnv_called_once(f):
         return f(self, *args, **kwargs)
     wrapper.called = False
     return wrapper
+
 
 def vnv_called_without_parameter(parameter):
     def decorator(f):

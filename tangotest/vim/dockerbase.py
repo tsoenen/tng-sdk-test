@@ -31,7 +31,7 @@
 # partner consortium (www.5gtango.eu).
 
 import os
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractproperty
 import docker
 import requests
 
