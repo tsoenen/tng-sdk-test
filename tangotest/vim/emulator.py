@@ -256,18 +256,6 @@ class EmulatorInstance(DockerBasedInstance):
     Should not be created manually but by the Emulator class.
     """
 
-    def __init__(self, vim, name, interfaces=None):
-        """
-        Initialize the instance.
-
-        Args:
-            name (str): The name of an instance
-            path (str): The path to the directory containing Dockerfile
-            interfaces (list): Network configuration
-        """
-        self.vim = vim
-        self.name = name
-        self.docker_client = self.vim.docker_client
-        self.interfaces = interfaces
-        self.output = None
-        self.container = self.docker_client.containers.get('mn.{}'.format(name))
+    @property
+    def name():
+        return 'mn.{}'.format(self._name)

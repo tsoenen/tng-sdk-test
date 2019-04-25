@@ -150,11 +150,15 @@ class DockerBasedInstance(BaseInstance):
             interfaces (list): Network configuration
         """
         self.vim = vim
-        self.name = name
+        self._name = name
         self.docker_client = self.vim.docker_client
         self.interfaces = interfaces or []
         self.output = None
-        self.container = self.docker_client.containers.get(name)
+        self.container = self.docker_client.containers.get(self.name)
+
+    @property
+    def name(self):
+        return self._name
 
     def execute(self, cmd, stream=False, **kwargs):
         return self.container.exec_run(cmd=['sh', '-c', cmd], stream=stream, **kwargs)
