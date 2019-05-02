@@ -2,7 +2,7 @@ import pytest
 import time
 import inspect, os
 
-from tangotest.vnv_checker import VnvError
+from tangotest.tangotools.vnv_checker import VnvError
 
 
 def test_vnv_checker_add_instances_from_package_called_once(emulator_with_vnv_checker_enabled):

@@ -254,5 +254,5 @@ class EmulatorInstance(DockerBasedInstance):
     """
 
     @property
-    def name(self):
-        return 'mn.{}'.format(self._name)
+    def container_name(self):
+        return 'mn.{}'.format(self.name)
