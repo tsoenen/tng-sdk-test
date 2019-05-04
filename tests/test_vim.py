@@ -4,7 +4,7 @@ import inspect, os
 
 
 @pytest.mark.parametrize('package,package_format,expected_instances', [
-    ('/packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango', ['vnf0.vdu01', 'vnf1.vdu01']),
+    ('/packages/eu.5gtango.emulator-example-service.0.1.tgo', 'tango', ['vnf0.vdu01.0', 'vnf1.vdu01.0']),
     ('/packages/eu.sonata.emulator-example-service.0.1.son', 'sonata', ['empty_vnf1', 'empty_vnf2', 'empty_vnf3']),
 ])
 def test_add_instances_from_package(vim, package, package_format, expected_instances):
