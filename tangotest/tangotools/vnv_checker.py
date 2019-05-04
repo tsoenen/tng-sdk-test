@@ -36,6 +36,27 @@ class VnvError(Exception):
     pass
 
 
+vnv_checker_data = {}
+
+
+def vnv_checker_start(f):
+    def wrapper(self, *args, **kwargs):
+        if self.vnv_checker:
+            self._vnv_checker_data = vnv_checker_data.copy()
+        return f(self, *args, **kwargs)
+    return wrapper
+
+
+def vnv_checker_stop(f):
+    def wrapper(self, *args, **kwargs):
+        if self.vnv_checker:
+            for k, v in self._vnv_checker_data.items():
+                if not v:
+                    raise VnvError('Requirement not met: {}'.format(k))
+        return f(self, *args, **kwargs)
+    return wrapper
+
+
 def vnv_not_called(f):
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
@@ -47,11 +68,11 @@ def vnv_not_called(f):
 def vnv_called_once(f):
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
-            if wrapper.called:
+            if self._vnv_checker_data['Called {}'.format(f.__name__)]:
                 raise VnvError('Function {} can be called only once on the V&V'.format(f.__name__))
-            wrapper.called = True
+            self._vnv_checker_data['Called {}'.format(f.__name__)] = True
         return f(self, *args, **kwargs)
-    wrapper.called = False
+    vnv_checker_data['Called {}'.format(f.__name__)] = False
     return wrapper
 
 

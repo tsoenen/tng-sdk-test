@@ -47,7 +47,7 @@ from emuvim.api.tango import TangoLLCMEndpoint
 from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.utils import get_free_tcp_port
 
-from tangotest.tangotools.vnv_checker import vnv_called_once, vnv_not_called, vnv_called_without_parameter
+from tangotest.tangotools.vnv_checker import vnv_called_once, vnv_not_called, vnv_called_without_parameter, vnv_checker_start, vnv_checker_stop
 
 
 class Emulator(DockerBasedVIM):
@@ -85,6 +85,7 @@ class Emulator(DockerBasedVIM):
     def InstanceClass(self):
         return EmulatorInstance
 
+    @vnv_checker_start
     def start(self):
         """
         Run the Emulator and the endpoints.
@@ -121,6 +122,7 @@ class Emulator(DockerBasedVIM):
 
         self.net.start()
 
+    @vnv_checker_stop
     def stop(self):
         """
         Stop the Emulator and the endpoints.
