@@ -49,7 +49,7 @@ class Vnv(DockerBasedVIM):
         package_data = parse_package(package_format)
 
         instances = []
-        for name, vdus in package_data.items():
+        for name, vdus in package_data['endpoints'].items():
             if len(vdus) != 1:
                 raise Exception('Only one deployment unit per NF is supported.')
             interfaces = vdus.items()[0][1]

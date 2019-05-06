@@ -35,6 +35,24 @@ import yaml
 
 
 def parse_package(package_path, package_format='tango'):
+    """
+    Extract information needed for testing.
+
+    Output example:
+        {
+            'ns_name': 'my_ns',
+            'testing_tags': ['tag1', 'tag2'],
+            'endpoints': {
+                'nf1': {
+                    'vdu1': ['input', 'output']
+                }
+            }
+        }
+    """
+    # TODO: parametrize functions type (virtual, cloud)
+    # TODO: parametrize platform type (5gtango, osm, onap)
+    # TODO: support multiple NSDs
+
     if package_format == 'tango':
         return parse_tango_package(package_path)
     else:
@@ -42,7 +60,11 @@ def parse_package(package_path, package_format='tango'):
 
 
 def parse_tango_package(package_path):
-    # TODO: parametrize function type (virtual, cloud)
+    def extract_external_cps(descriptor, upper_level_cps):
+        virtual_links = [vl['connection_points_reference'] for vl in descriptor['virtual_links']]
+        external_virtual_links = [vl for vl in virtual_links if set(vl) & set(upper_level_cps)]
+        external_cps = list(set(sum(external_virtual_links, [])).difference(upper_level_cps))
+        return external_cps
 
     result = {}
     nsd = None
@@ -58,28 +80,32 @@ def parse_tango_package(package_path):
                     raise Exception('Only one NSD can be in the package')
                 with z.open(record['source']) as nsd_file:
                     nsd = yaml.safe_load(nsd_file)
+                result['tags'] = record.get('tags', [])
+                result['testing_tags'] = record.get('testing_tags', [])
             if record['content-type'] == 'application/vnd.5gtango.vnfd':
                 with z.open(record['source']) as nfd_file:
                     nfd = yaml.safe_load(nfd_file)
                     nfds[nfd['name']] = nfd
 
+    result['ns_name'] = nsd['name']
+    result['ns_version'] = nsd['version']
+    result['ns_vendor'] = nsd['vendor']
+    result['endpoints'] = {}
+
     external_ns_cps = [cp['id'] for cp in nsd['connection_points'] if cp['type'] == 'external']
-    ns_virtual_links = [vl['connection_points_reference'] for vl in nsd['virtual_links']]
-    external_ns_virtual_links = [vl for vl in ns_virtual_links if set(vl) & set(external_ns_cps)]
-    external_nfs_cps = list(set(sum(external_ns_virtual_links, [])).difference(external_ns_cps))
+    external_nfs_cps = extract_external_cps(nsd, external_ns_cps)
 
     for nf in nsd['network_functions']:
         nf_name = nf['vnf_name']
         nf_id = nf['vnf_id']
         nfd = nfds[nf_name]
         external_nf_cps = [cp.split(':')[1] for cp in external_nfs_cps if cp.split(':')[0] == nf_id]
-        nf_virtual_links = [vl['connection_points_reference'] for vl in nfd['virtual_links']]
-        external_nf_virtual_links = [vl for vl in nf_virtual_links if set(vl) & set(external_nf_cps)]
-        external_dus_cps = list(set(sum(external_nf_virtual_links, [])).difference(external_nf_cps))
-        result[nf_name] = {}
+        external_dus_cps = extract_external_cps(nfd, external_nf_cps)
+
+        result['endpoints'][nf_name] = {}
         for du in nfd['virtual_deployment_units']:
             du_name = du['id']
             external_du_cps = [cp.split(':')[1] for cp in external_dus_cps if cp.split(':')[0] == du_name]
-            result[nf_name][du_name] = external_du_cps
+            result['endpoints'][nf_name][du_name] = external_du_cps
 
     return result
