@@ -35,7 +35,7 @@ import tempfile
 import docker
 
 
-def build_probe(path, main_file_name):
+def build_probe(path, entrypoint):
     dockerfile_content = """
     FROM ubuntu:xenial
     RUN apt-get update -q && apt-get install -qy \
@@ -52,8 +52,9 @@ def build_probe(path, main_file_name):
     RUN pip install git+https://github.com/sonata-nfv/tng-sdk-test
     COPY . tests/
     RUN pip install -r reqirements.txt
+    ENV TANGOTEST_PLATFORM VNV
     CMD {}
-    """.format(main_file_name)
+    """.format(entrypoint)
 
     dockerfile = tempfile.NamedTemporaryFile()
     dockerfile.write(dockerfile_content)

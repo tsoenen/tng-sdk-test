@@ -34,6 +34,7 @@ import os
 from contextlib import contextmanager
 
 from tangotest.vim.emulator import Emulator
+from tangotest.vim.vnv import Vnv
 
 
 @contextmanager
@@ -42,6 +43,8 @@ def vim_from_env():
         vim = Emulator()
     elif os.environ['TANGOTEST_PLATFORM'] == 'EMULATOR_VNV_CHECKER':
         vim = Emulator(vnv_checker=True)
+    elif os.environ['TANGOTEST_PLATFORM'] == 'VNV':
+        vim = Vnv()
     else:
         vim = Emulator()
 
