@@ -89,7 +89,7 @@ def generate_test_descriptor(ns_name, testing_tags, endpoints):
                     'file': 'status.txt',
                     'find': 'exit-code',
                     'value': '0',
-                    'verdict': 'pass'
+                    'verdict': 'pass',
                     'condition': '=',
                 }]
             }]
