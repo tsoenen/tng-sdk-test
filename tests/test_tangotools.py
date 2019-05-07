@@ -37,15 +37,47 @@ from contextlib import contextmanager
 
 from tangotest.vim.emulator import Emulator
 from tangotest.tangotools.vnv_checker import VnvError
+from tangotest.tangotools.package_parser import parse_package
 
 
-packages = [{
-    'package': '/packages/eu.5gtango.emulator-example-service.0.1.tgo',
-    'format': 'tango',
-}, {
-    'package': '/packages/eu.sonata.emulator-example-service.0.1.son',
-    'format': 'sonata',
-}]
+packages = [(
+    '/packages/eu.5gtango.emulator-example-service.0.1.tgo',
+    'tango',
+    {
+        'endpoints': {
+            'default-vnf0': {
+                'vdu01': ['input']
+            },
+            'default-vnf1': {
+                'vdu01': ['output']
+            }
+        },
+        'ns_name': 'emulator_example',
+        'ns_vendor': 'eu.5gtango',
+        'ns_version': '0.9',
+        'tags': ['eu.5gtango'],
+        'testing_tags': [],
+    }
+), (
+    '/packages/eu.sonata.emulator-example-service.0.1.son',
+    'sonata',
+    None
+), (
+    '/packages/eu.5gtango.test-ns-nsid1v.0.1.tgo',
+    'tango',
+    {
+        'endpoints': {
+            'testvnf': {
+                'vdu01': ['eth1', 'eth2']
+            }
+        },
+        'ns_name': 'test-nsid1v',
+        'ns_vendor': 'eu.5gtango',
+        'ns_version': '0.1',
+        'tags': ['eu.5gtango'],
+        'testing_tags': ['eu.5gtango.testingtag.example']
+    }
+)]
 
 
 test_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -67,15 +99,15 @@ def does_not_raise():
     yield
 
 
-@pytest.mark.parametrize('calls,expectation', [
+@pytest.mark.parametrize('function_calls,expectation', [
     (0, pytest.raises(VnvError)),
     (1, does_not_raise()),
     (2, pytest.raises(VnvError)),
 ])
-def test_vnv_checker_add_instances_from_package_called_once(calls, expectation):
+def test_vnv_checker_add_instances_from_package_called_once(function_calls, expectation):
     with expectation:
         with Emulator(vnv_checker=True) as vim:
-            for i in range(calls):
+            for i in range(function_calls):
                 path = test_dir + packages[i]['package']
                 package_format = packages[i]['format']
                 vim.add_instances_from_package(package=path, package_format=package_format)
@@ -119,3 +151,12 @@ def test_vnv_checker_add_link_not_called(called, expectation):
             vim.add_instance_from_image(name=name2, image=image)
             if called:
                 vim.add_link(name1, 'cp0', name2, 'cp0')
+
+
+@pytest.mark.parametrize('package_path,package_format,expected_result', packages)
+def test_package_parser(package_path, package_format, expected_result):
+    if expected_result is None:
+        pytest.skip('unsupported package')
+    path = test_dir + package_path
+    result = parse_package(path, package_format)
+    assert result == expected_result
