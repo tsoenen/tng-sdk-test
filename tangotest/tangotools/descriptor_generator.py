@@ -44,27 +44,27 @@ def generate_test_descriptor(ns_name, testing_tags, endpoints):
         'testing_tags': testing_tags,
         'test_category': 'functional',
         'phases': [{
-        		'id': 'setup',
+            'id': 'setup',
             'steps': [{
-              	'name': 'deployment',
+                'name': 'deployment',
                 'description': 'Deploying a NS',
                 'action': 'deploy',
-        		}, {
-              	'name': 'configuration',
+            }, {
+                'name': 'configuration',
                 'description': 'Configuring test',
                 'action': 'configure',
                 'probes': [{
-                  	'id': 'tester',
+                    'id': 'tester',
                     'name': 'tester',
-                    'image': 'registry.sonata-nfv.eu:5000/tng-sdk-test-{}:latest'.format(ns_name)
+                    'image': 'registry.sonata-nfv.eu:5000/tng-sdk-test-{}:latest'.format(ns_name),
                     'description': 'A container with tng-sdk-test and the test code',
                     'parameters': [{
-        								'{}_{}'.format(vnf, interface): '$({}/endpoints/name:{}/address)'.format(vnf, interface)
-        						} for vnf in endpoints for interface in endpoints[vnf]],
-        				}],
-        		}],
+                        '{}_{}'.format(vnf, interface): '$({}/endpoints/name:{}/address)'.format(vnf, interface)
+                    } for vnf in endpoints for interface in endpoints[vnf]],
+                }],
+            }],
         }, {
-          	'id': 'excercise',
+            'id': 'excercise',
             'steps': [{
                 'name': 'run_tests',
                 'description': 'Run a probe with tng-sdk-test and the test code',
@@ -75,8 +75,8 @@ def generate_test_descriptor(ns_name, testing_tags, endpoints):
                 'output': [{
                     'results': 'logs.txt',
                     'verdict': 'status.txt',
-        				}],
-        		}],
+                }],
+            }],
         }, {
             'id': 'verification',
             'steps': [{
@@ -87,11 +87,11 @@ def generate_test_descriptor(ns_name, testing_tags, endpoints):
                     'type': 'json',
                     'name': 'test-exit-code',
                     'file': 'status.txt',
-                  	'find': 'exit-code',
+                    'find': 'exit-code',
                     'value': '0',
-                  	'verdict': 'pass'
-                  	'condition': '=',
-        				}]
-        		}]
+                    'verdict': 'pass'
+                    'condition': '=',
+                }]
+            }]
         }]
     }

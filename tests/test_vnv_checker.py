@@ -1,6 +1,38 @@
+#  Copyright (c) 2015 SONATA-NFV, 5GTANGO
+# ALL RIGHTS RESERVED.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Neither the name of the SONATA-NFV, 5GTANGO
+# nor the names of its contributors may be used to endorse or promote
+# products derived from this software without specific prior written
+# permission.
+#
+# This work has been performed in the framework of the SONATA project,
+# funded by the European Commission under Grant number 671517 through
+# the Horizon 2020 and 5G-PPP programmes. The authors would like to
+# acknowledge the contributions of their colleagues of the SONATA
+# partner consortium (www.sonata-nfv.eu).
+#
+# This work has also been performed in the framework of the 5GTANGO project,
+# funded by the European Commission under Grant number 761493 through
+# the Horizon 2020 and 5G-PPP programmes. The authors would like to
+# acknowledge the contributions of their colleagues of the SONATA
+# partner consortium (www.5gtango.eu).
+
 import pytest
-import time
-import inspect, os
+import inspect
+import os
 from contextlib import contextmanager
 
 from tangotest.vim.emulator import Emulator
@@ -28,7 +60,6 @@ def emulator_with_vnv_checker_and_package():
     vim.add_instances_from_package(package=path, package_format=package_format)
     yield vim
     vim.stop()
-
 
 
 @contextmanager
@@ -84,7 +115,7 @@ def test_vnv_checker_add_link_not_called(called, expectation):
             name1 = 'tangotest_test1'
             name2 = 'tangotest_test2'
             image = 'ubuntu:trusty'
-            instance1 = vim.add_instance_from_image(name=name1, image=image)
-            instance2 = vim.add_instance_from_image(name=name2, image=image)
+            vim.add_instance_from_image(name=name1, image=image)
+            vim.add_instance_from_image(name=name2, image=image)
             if called:
                 vim.add_link(name1, 'cp0', name2, 'cp0')
