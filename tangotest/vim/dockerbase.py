@@ -45,6 +45,7 @@ class DockerBasedVIM(BaseVIM):
     def __init__(self, *args, **kwargs):
         super(DockerBasedVIM, self).__init__(*args, **kwargs)
         self.built_images = []
+        self.containers = []
 
     @abstractproperty
     def InstanceClass(self):
@@ -57,6 +58,8 @@ class DockerBasedVIM(BaseVIM):
     def stop(self):
         for image in self.built_images:
             self.docker_client.images.remove(image=image)
+        for container in self.containers:
+            container.remove(force=True)
         super(DockerBasedVIM, self).stop()
 
     def _image_exists(self, image):
@@ -75,7 +78,7 @@ class DockerBasedVIM(BaseVIM):
             raise e
         return True
 
-    def add_instance_from_image(self, name, image, interfaces=None, docker_command=None, **docker_run_args):
+    def add_instance_from_image(self, name, image, docker_command='/bin/bash', **docker_run_args):
         """
         Run a Docker image on the Emulator.
 
@@ -92,10 +95,12 @@ class DockerBasedVIM(BaseVIM):
         if not self._image_exists(image):
             raise Exception('Docker image {} not found'.format(image))
 
-        self.container = self.docker_client.containers.run(name=name, image=image, command=docker_command, **docker_run_args)
+        container = self.docker_client.containers.run(name=name, image=image, command=docker_command,
+                                                      tty=True, detach=True, **docker_run_args)
+        self.containers.append(container)
         # TODO: udev names
         interfaces = ['eth0']
-
+0
         return self._add_instance(name, interfaces)
 
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,

@@ -35,28 +35,24 @@ import tempfile
 import docker
 
 
-def build_probe(path, entrypoint):
+def build_probe(path):
     dockerfile_content = """
     FROM ubuntu:xenial
     RUN apt-get update -q && apt-get install -qy \
         apt-transport-https \
         ca-certificates \
-        lxc \
-        iptables \
         python-setuptools \
         python-dev \
         python-pip \
-        curl \
-        git
-    RUN curl -sSL https://get.docker.com/ | sh
+        git \
+        libltdl-dev
     RUN pip install git+https://github.com/sonata-nfv/tng-sdk-test
-    COPY . tests/
-    RUN pip install -r reqirements.txt
+    COPY . /
     ENV TANGOTEST_PLATFORM VNV
-    CMD {}
-    """.format(entrypoint)
+    CMD /bin/bash
+    """
 
-    dockerfile = tempfile.NamedTemporaryFile()
+    dockerfile = tempfile.NamedTemporaryFile(bufsize=0)
     dockerfile.write(dockerfile_content)
 
     docker_client = docker.from_env()
