@@ -33,20 +33,21 @@
 import os
 from contextlib import contextmanager
 
-from tangotest.vim.emulator import Emulator
-from tangotest.vim.vnv import Vnv
-
 
 @contextmanager
 def vim_from_env():
-    if os.environ['TANGOTEST_PLATFORM'] == 'EMULATOR':
+    platform = os.environ.get('TANGOTEST_PLATFORM', 'EMULATOR')
+    if platform == 'EMULATOR':
+        from tangotest.vim.emulator import Emulator
         vim = Emulator()
-    elif os.environ['TANGOTEST_PLATFORM'] == 'EMULATOR_VNV_CHECKER':
+    elif platform == 'EMULATOR_VNV_CHECKER':
+        from tangotest.vim.emulator import Emulator
         vim = Emulator(vnv_checker=True)
-    elif os.environ['TANGOTEST_PLATFORM'] == 'VNV':
+    elif platform == 'VNV':
+        from tangotest.vim.vnv import Vnv
         vim = Vnv()
     else:
-        vim = Emulator()
+        raise Exception('Unkown platform {}'.format(platform))
 
     vim.start()
     yield vim
