@@ -49,6 +49,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
+        'pyyaml',
         'docker>=3.7.0',
         'more-itertools<=5.0.0',
     ],
