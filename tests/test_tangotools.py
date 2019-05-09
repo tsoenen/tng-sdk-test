@@ -170,8 +170,6 @@ def test_probe_builder():
     image_name = build_probe(path)
     command = 'python2 main.py'
 
-    # image_name = 'probe'
-
     volumes = {
         '/var/run/docker.sock': {
             'bind': '/var/run/docker.sock',
@@ -186,6 +184,8 @@ def test_probe_builder():
     docker_client = docker.from_env()
     test_results = docker_client.containers.run(image=image_name, volumes=volumes, tty=True, command=command, remove=True)
 
-    expected_results = b'hello world\n'
+    docker_client.images.remove(image_name)
+
+    expected_results = b'hello world\r\n\r\n'
     assert test_results == expected_results
 
