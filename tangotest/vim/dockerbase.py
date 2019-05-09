@@ -100,7 +100,7 @@ class DockerBasedVIM(BaseVIM):
         self.containers.append(container)
         # TODO: udev names
         interfaces = ['eth0']
-0
+
         return self._add_instance(name, interfaces)
 
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,

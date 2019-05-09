@@ -34,10 +34,12 @@ import pytest
 import inspect
 import os
 from contextlib import contextmanager
+import docker
 
 from tangotest.vim.emulator import Emulator
 from tangotest.tangotools.vnv_checker import VnvError
 from tangotest.tangotools.package_parser import parse_package
+from tangotest.tangotools.probe_builder import build_probe
 
 
 packages = [(
@@ -160,3 +162,30 @@ def test_package_parser(package_path, package_format, expected_result):
     path = test_dir + package_path
     result = parse_package(path, package_format)
     assert result == expected_result
+
+
+def test_probe_builder():
+    test_code_path = '/simple-test/'
+    path = test_dir + test_code_path
+    image_name = build_probe(path)
+    command = 'python2 main.py'
+
+    # image_name = 'probe'
+
+    volumes = {
+        '/var/run/docker.sock': {
+            'bind': '/var/run/docker.sock',
+            'mode': 'ro',
+        },
+        '/usr/bin/docker': {
+            'bind': '/usr/bin/docker',
+            'mode': 'ro',
+        }
+    }
+
+    docker_client = docker.from_env()
+    test_results = docker_client.containers.run(image=image_name, volumes=volumes, tty=True, command=command, remove=True)
+
+    expected_results = b'hello world\n'
+    assert test_results == expected_results
+
