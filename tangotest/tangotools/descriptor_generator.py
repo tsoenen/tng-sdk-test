@@ -30,8 +30,6 @@
 # acknowledge the contributions of their colleagues of the SONATA
 # partner consortium (www.5gtango.eu).
 
-import yaml
-
 
 def generate_test_descriptor(ns_name, testing_tags, endpoints):
     return {
