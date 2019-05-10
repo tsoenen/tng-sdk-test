@@ -47,7 +47,13 @@ from emuvim.api.tango import TangoLLCMEndpoint
 from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.utils import get_free_tcp_port
 
-from tangotest.tangotools.vnv_checker import vnv_called_once, vnv_not_called, vnv_called_without_parameter, vnv_checker_start, vnv_checker_stop
+from tangotest.tangotools.vnv_checker import (
+    vnv_called_once,
+    vnv_not_called,
+    vnv_called_without_parameter,
+    vnv_checker_start,
+    vnv_checker_stop
+)
 
 
 class Emulator(DockerBasedVIM):

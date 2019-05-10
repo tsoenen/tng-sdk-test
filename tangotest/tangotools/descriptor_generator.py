@@ -30,6 +30,7 @@
 # acknowledge the contributions of their colleagues of the SONATA
 # partner consortium (www.5gtango.eu).
 
+# flake8: noqa
 
 def generate_test_descriptor(ns_name, testing_tags, endpoints):
     return {
