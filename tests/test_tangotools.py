@@ -89,8 +89,8 @@ test_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 def emulator_with_vnv_checker_and_package():
     vim = Emulator(vnv_checker=True)
     vim.start()
-    path = test_dir + packages[0]['package']
-    package_format = packages[0]['format']
+    path = test_dir + packages[0][0]
+    package_format = packages[0][1]
     vim.add_instances_from_package(package=path, package_format=package_format)
     yield vim
     vim.stop()
@@ -110,8 +110,8 @@ def test_vnv_checker_add_instances_from_package_called_once(function_calls, expe
     with expectation:
         with Emulator(vnv_checker=True) as vim:
             for i in range(function_calls):
-                path = test_dir + packages[i]['package']
-                package_format = packages[i]['format']
+                path = test_dir + packages[i][0]
+                package_format = packages[i][1]
                 vim.add_instances_from_package(package=path, package_format=package_format)
 
 
