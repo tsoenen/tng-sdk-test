@@ -43,6 +43,7 @@ from emuvim.dcemulator.net import DCNetwork
 from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
 from emuvim.api.sonata import SonataDummyGatekeeperEndpoint
 from emuvim.api.tango import TangoLLCMEndpoint
+from emuvim.api.tango.llcm import initialize_GK
 
 from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.utils import get_free_tcp_port
@@ -98,7 +99,7 @@ class Emulator(DockerBasedVIM):
         """
         super(Emulator, self).start()
 
-        self.docker_client = docker.from_env()
+        initialize_GK()
 
         self.net = DCNetwork(controller=RemoteController, monitor=False, enable_learning=False)
         self.datacenter = self.net.addDatacenter('dc1')
