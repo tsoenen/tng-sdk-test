@@ -2,7 +2,7 @@
 set -e
 
 # Build vim-emu docker image
-if [[ -d vim-emu ]]; then
+if [ -d "vim-emu" ]; then
     cd ./vim-emu
     git pull
 else
