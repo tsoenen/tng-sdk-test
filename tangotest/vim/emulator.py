@@ -31,7 +31,6 @@
 # partner consortium (www.5gtango.eu).
 
 import os
-import docker
 import requests
 
 from mininet.node import RemoteController
