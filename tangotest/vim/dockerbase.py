@@ -56,10 +56,10 @@ class DockerBasedVIM(BaseVIM):
         self.docker_client = docker.from_env()
 
     def stop(self):
-        for image in self.built_images:
-            self.docker_client.images.remove(image=image)
         for container in self.containers:
             container.remove(force=True)
+        for image in self.built_images:
+            self.docker_client.images.remove(image=image, force=True)
         super(DockerBasedVIM, self).stop()
 
     def _image_exists(self, image):
