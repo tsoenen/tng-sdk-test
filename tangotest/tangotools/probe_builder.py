@@ -35,7 +35,7 @@ import tempfile
 import docker
 
 
-def build_probe(path):
+def build_probe(path, name=None):
     dockerfile_content = """
     FROM ubuntu:xenial
     RUN apt-get update -q && apt-get install -qy \
@@ -58,7 +58,7 @@ def build_probe(path):
     docker_client = docker.from_env()
     docker_image, _ = docker_client.images.build(path=path, dockerfile=dockerfile.name)
 
-    tag = 'tng-sdk-test-{}'.format(time.strftime("%Y-%m-%d-%H-%M-%S"))
+    tag = name or 'tng-sdk-test-{}'.format(time.strftime("%Y-%m-%d-%H-%M-%S"))
     docker_image.tag(tag)
 
     return tag
