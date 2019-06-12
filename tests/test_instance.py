@@ -45,7 +45,7 @@ def test_execute(vnf, cmd, expected_exec_output, expected_exec_code):
 
 
 def test_get_ip(vnf):
-    ip = vnf.get_ip(0)
+    ip = vnf.get_ip('emu0')
     cmd = 'ping -c1 -W1 {}'.format(ip)
     exec_code, exec_output = vnf.execute(cmd)
     assert exec_code == 0

@@ -168,20 +168,19 @@ class Emulator(DockerBasedVIM):
         for name, instance in self.datacenter.containers.items():
             if name in self.instances:
                 continue
-            interfaces = [i['intf_name'] for i in instance.getNetworkStatus()]
-            instances.append(self._add_instance(name, interfaces))
+            instances.append(self._add_instance(name))
 
         return instances
 
-    @vnv_called_without_parameter('interfaces')
-    def add_instance_from_image(self, name, image, interfaces=None, docker_command=None):
+    @vnv_called_without_parameter('network')
+    def add_instance_from_image(self, name, image, network=None, docker_command=None):
         """
         Run a Docker image on the Emulator.
 
         Args:
             name (str): The name of an instance
             image (str): The name of an image
-            interfaces (int) or (list): Network configuration
+            network (int), (list) (str) or (dict): Network configuration
             docker_command (str): The command to execute when starting the instance
 
         Returns:
@@ -191,14 +190,18 @@ class Emulator(DockerBasedVIM):
         if not self._image_exists(image):
             raise Exception('Docker image {} not found'.format(image))
 
-        if not interfaces:
-            interfaces = ['cp0']
-        elif isinstance(interfaces, int):
-            interfaces = ['cp{}'.format(i) for i in range(interfaces)]
-        elif not isinstance(interfaces, list):
-            raise Exception('Parameter (interfaces) must be None, integer or string, passed {}'.format(type(interfaces)))
-
-        network = ','.join(['(id={})'.format(i) for i in interfaces])
+        if not network:
+            network = '(id=emu0)'
+        elif isinstance(network, str):
+            pass
+        elif isinstance(network, int):
+            network = ','.join(['(id=emu{})'.format(i) for i in range(network)])
+        elif isinstance(network, list):
+            network = ','.join(['(id={})'.format(i) for i in network])
+        elif isinstance(network, dict):
+            network = ','.join(['(id={},ip={})'.format(k, v) for k, v in network.items()])
+        else:
+            raise Exception('Wrong network configuration: {}'.format(network))
 
         params = {
             'name': name,
@@ -211,10 +214,10 @@ class Emulator(DockerBasedVIM):
 
         EmuComputeClient().start(params)
 
-        return self._add_instance(name, interfaces)
+        return self._add_instance(name)
 
-    @vnv_called_without_parameter('interfaces')
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
+    @vnv_called_without_parameter('network')
+    def add_instance_from_source(self, name, path, network=None, permanent_name=None,
                                  docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator.
@@ -222,7 +225,7 @@ class Emulator(DockerBasedVIM):
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
-            interfaces (int) or (list): Network configuration
+            network (int), (list) (str) or (dict): Network configuration
             permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
             docker_command (str): The command to execute when starting the instance
             **docker_build_args: Extra arguments to be used by the Docker engine to build the image
@@ -230,7 +233,7 @@ class Emulator(DockerBasedVIM):
         Returns:
             (EmulatorInstance): The added instance
         """
-        return super(Emulator, self).add_instance_from_source(name, path, interfaces,
+        return super(Emulator, self).add_instance_from_source(name, path, network,
                                                               permanent_name, docker_command,
                                                               **docker_build_args)
 

@@ -52,16 +52,15 @@ class Vnv(DockerBasedVIM):
         for name, vdus in package_data['endpoints'].items():
             if len(vdus) != 1:
                 raise Exception('Only one deployment unit per NF is supported.')
-            interfaces = vdus.items()[0][1]
-            instances.append(self._add_instance(name, interfaces))
+            instances.append(self._add_instance(name))
 
         return instances
 
     def add_link(self, *args, **kwargs):
         raise Exception('Network configuration is not available')
 
-    def _add_immutable_instance(self, name, interfaces):
-        instance = VnvImmutableInstance(self, name, interfaces)
+    def _add_immutable_instance(self, name):
+        instance = VnvImmutableInstance(self, name)
         self.instances[name] = instance
         return instance
 
@@ -84,28 +83,24 @@ class VnvImmutableInstance(BaseImmutableInstance):
         Get an IP address of an interface.
 
         Args:
-            interface (int) or (str): A number or name of the interface
+            interface (str): The name of the interface
 
         Returns:
             (str) or (None): The IP address of the interface or None if the interface doesn't exist
                              or if the interface has no IP address
         """
-        if isinstance(interface, int):
-            interface = self.interfaces[interface]
-        if not isinstance(interface, str):
-            raise Exception('Instance {} has no interface {}.'.format(self.name, interface))
 
         env_name = '{}_{}'.format(self.name, interface)
-        return os.environ[env_name]
+        return os.environ.get(env_name, None)
 
     def get_mac(self, interface):
         """
         Get a MAC address of an interface.
 
         Args:
-            interface (int) or (str): A number or name of the interface
+            interface (str): The name of the interface
 
         Returns:
             (str) or (None): The MAC address of the interface or None if the interface doesn't exist
         """
-        pass
+        raise Exception('Can not get mac address of an immutable instance')

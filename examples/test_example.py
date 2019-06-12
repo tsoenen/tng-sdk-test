@@ -43,8 +43,8 @@ def testbed():
     with Emulator() as vim:
         vim.add_instance_from_source('client', 'tangoclient')
         vim.add_instance_from_source('server', 'tangoserver')
-        vim.add_instance_from_source('firewall', 'tangofirewall', interfaces=['input', 'output'])
-        vim.add_instance_from_source('snort', 'tangosnort', interfaces=['input', 'output'])
+        vim.add_instance_from_source('firewall', 'tangofirewall', ['input', 'output'])
+        vim.add_instance_from_source('snort', 'tangosnort', ['input', 'output'])
         vim.add_link('client', 'cp0', 'firewall', 'input')
         vim.add_link('firewall', 'output', 'snort', 'input', sniff=True)
         vim.add_link('snort', 'output', 'server', 'cp0')

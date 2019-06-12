@@ -78,14 +78,14 @@ class DockerBasedVIM(BaseVIM):
             raise e
         return True
 
-    def add_instance_from_image(self, name, image, docker_command='/bin/bash', **docker_run_args):
+    def add_instance_from_image(self, name, image, network=None, docker_command='/bin/bash', **docker_run_args):
         """
         Run a Docker image on the Emulator.
 
         Args:
             name (str): The name of an instance
             image (str): The name of an image
-            interfaces (int) or (list): Network configuration
+            network (int) or (list) or (dict): Network configuration (if supported)
             docker_command (str): The command to execute when starting the instance
 
         Returns:
@@ -98,12 +98,9 @@ class DockerBasedVIM(BaseVIM):
         container = self.docker_client.containers.run(name=name, image=image, command=docker_command,
                                                       tty=True, detach=True, **docker_run_args)
         self.containers.append(container)
-        # TODO: udev names
-        interfaces = ['eth0']
+        return self._add_instance(name)
 
-        return self._add_instance(name, interfaces)
-
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
+    def add_instance_from_source(self, name, path, network=None, permanent_name=None,
                                  docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator.
@@ -111,7 +108,7 @@ class DockerBasedVIM(BaseVIM):
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
-            interfaces (int) or (list): Network configuration
+            network (int) or (list) or (dict): Network configuration
             permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
             docker_command (str): The command to execute when starting the instance
             **docker_build_args: Extra arguments to be used by the Docker engine to build the image
@@ -136,7 +133,7 @@ class DockerBasedVIM(BaseVIM):
         if not permanent_name:
             self.built_images.append(tag)
 
-        return self.add_instance_from_image(name, tag, interfaces)
+        return self.add_instance_from_image(name, tag, network)
 
 
 class DockerBasedInstance(BaseInstance):
@@ -146,19 +143,17 @@ class DockerBasedInstance(BaseInstance):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, vim, name, interfaces=None):
+    def __init__(self, vim, name):
         """
         Initialize the instance.
 
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
-            interfaces (list): Network configuration
         """
         self.vim = vim
         self.name = name
         self.docker_client = self.vim.docker_client
-        self.interfaces = interfaces or []
         self.output = None
         self.container = self.docker_client.containers.get(self.container_name)
 
