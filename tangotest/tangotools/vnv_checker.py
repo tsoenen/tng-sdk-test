@@ -30,6 +30,8 @@
 # acknowledge the contributions of their colleagues of the SONATA
 # partner consortium (www.5gtango.eu).
 
+from functools import wraps
+
 
 class VnvError(Exception):
     """Raised by the Emulator class when vnv_checker is set and test failed"""
@@ -40,6 +42,7 @@ vnv_checker_data = {}
 
 
 def vnv_checker_start(f):
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
             self._vnv_checker_data = vnv_checker_data.copy()
@@ -48,6 +51,7 @@ def vnv_checker_start(f):
 
 
 def vnv_checker_stop(f):
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
             for k, v in self._vnv_checker_data.items():
@@ -58,6 +62,7 @@ def vnv_checker_stop(f):
 
 
 def vnv_not_called(f):
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
             raise VnvError('Function {} can not be used on the V&V'.format(f.__name__))
@@ -66,6 +71,7 @@ def vnv_not_called(f):
 
 
 def vnv_called_once(f):
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         if self.vnv_checker:
             if self._vnv_checker_data['Called {}'.format(f.__name__)]:
@@ -77,6 +83,7 @@ def vnv_called_once(f):
 
 
 def vnv_called_without_parameter(parameter):
+    @wraps(f)
     def decorator(f):
         def wrapper(self, *args, **kwargs):
             if self.vnv_checker:
