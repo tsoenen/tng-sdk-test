@@ -6,25 +6,16 @@
 
 # tng-sdk-test
 
-This repository contains a Python library `tangotest` for functional testing of VNFs.
+This repository contains a Python library `tangotest` for automated functional testing of VNFs.
+
+[The Emulator](https://osm.etsi.org/wikipub/index.php/VIM_emulator) is a light-weight emulation platform based on Containernet. Containernet is Mininet fork adding support for container-based (e.g. Docker) emulated hosts.
+VIM-EMU is used by the library to run tests locally.
+Then the library can be used to build a probe and generate a test descriptor to run tests on the V&V platform.
 
 ## Requirements
 
-- Ubuntu 16.04
+- Ubuntu 16.04+
 - python 2.7
-
-## Virtual infrastructure managers
-
-The library can be used with different VIMs. In order to use a specific VIM you need to install the appropriate software.
-
-### VIM-EMU
-
-VIM-EMU is a light-weight emulation platform based on Containernet. Containernet is Mininet fork adding support for container-based (e.g. Docker) emulated hosts.
-Additional information and installation instructions can be found on the [wiki page](https://osm.etsi.org/wikipub/index.php/VIM_emulator).
-
-### 5GTANGO Service Platform
-
-TODO
 
 ## Installation
 
@@ -40,9 +31,13 @@ or
 pip2 install git+https://github.com/sonata-nfv/tng-sdk-test
 ```
 
+In order to run tests locally, the Emulator needs to be installed separately.
+[Installation instructions for the Emulator](https://osm.etsi.org/wikipub/index.php/VIM_emulator).
+
 ## Usage
 
 [Documentation](https://tng-sdk-test.readthedocs.io/en/latest/index.html)
+
 
 ### Examples
 See [examples](https://github.com/sonata-nfv/tng-sdk-test/tree/master/examples) folder of this repository
