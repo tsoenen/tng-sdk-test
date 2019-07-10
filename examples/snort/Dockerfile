@@ -25,7 +25,5 @@ RUN chmod +x restart_snort.sh
 RUN mkdir /snort-logs
 
 # set entry point for emulator gatekeeper
-ENV SON_EMU_CMD ./start.sh
-
-# normal entry point
+ENV VIM_EMU_CMD ./start.sh
 CMD /bin/bash
