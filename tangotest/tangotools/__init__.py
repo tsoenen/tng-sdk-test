@@ -45,13 +45,13 @@ def create_vnv_test(source, package, descriptor, probe=None):
         source (str): The path of the directory with test files.
         package (str): The path of the package.
         descriptor (str): The path of the generated test descriptor.
-        probe (str): The name of the generated probe. If not specified the probe will have the name in a format 'tng-sdk-test-<date, time>''
+        probe (str): The name of the generated probe. Default value 'tng-sdk-test-<datetime>''
     """
 
     probe = build_probe(source, probe)
 
     package_data = parse_package(package)
     with open(descriptor, 'w') as f:
-        yaml.dump(generate_descriptor(package_data), f)
+        yaml.dump(generate_test_descriptor(package_data), f)
 
     return

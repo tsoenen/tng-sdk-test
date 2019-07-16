@@ -83,8 +83,8 @@ def vnv_called_once(f):
 
 
 def vnv_called_without_parameter(parameter):
-    @wraps(f)
     def decorator(f):
+        @wraps(f)
         def wrapper(self, *args, **kwargs):
             if self.vnv_checker:
                 if kwargs.get(parameter) is not None:
