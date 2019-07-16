@@ -45,7 +45,6 @@ class DockerBasedVIM(BaseVIM):
     def __init__(self, *args, **kwargs):
         super(DockerBasedVIM, self).__init__(*args, **kwargs)
         self.built_images = []
-        self.containers = []
 
     @abstractproperty
     def InstanceClass(self):
@@ -56,8 +55,6 @@ class DockerBasedVIM(BaseVIM):
         self.docker_client = docker.from_env()
 
     def stop(self):
-        for container in self.containers:
-            container.remove(force=True)
         for image in self.built_images:
             self.docker_client.images.remove(image=image, force=True)
         super(DockerBasedVIM, self).stop()
@@ -97,7 +94,6 @@ class DockerBasedVIM(BaseVIM):
 
         container = self.docker_client.containers.run(name=name, image=image, command=docker_command,
                                                       tty=True, detach=True, **docker_run_args)
-        self.containers.append(container)
         return self._add_instance(name)
 
     def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,

@@ -167,7 +167,7 @@ def test_package_parser(package_path, package_format, expected_result):
 def test_probe_builder():
     test_code_path = '/simple-test/'
     path = test_dir + test_code_path
-    image_name = build_probe(path)
+    image_name = build_probe(path, name='tangotest_testprobe')
     command = 'python2 main.py'
 
     volumes = {
@@ -183,8 +183,6 @@ def test_probe_builder():
 
     docker_client = docker.from_env()
     test_results = docker_client.containers.run(image=image_name, volumes=volumes, tty=True, command=command, remove=True)
-
-    docker_client.images.remove(image_name)
 
     expected_results = b'hello world\r\n\r\n'
     assert test_results == expected_results
