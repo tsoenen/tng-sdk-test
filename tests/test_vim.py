@@ -65,8 +65,8 @@ def test_add_instances_from_package(vim, package, package_format, expected_insta
 
 
 @pytest.mark.parametrize('interfaces,expected_interfaces', [
-    (None, ['cp0']),
-    (3, ['cp0', 'cp1', 'cp2']),
+    (None, ['emu0']),
+    (3, ['emu0', 'emu1', 'emu2']),
     (['input', 'output', 'management'], ['input', 'output', 'management']),
 ])
 def test_add_instance_from_image(vim, interfaces, expected_interfaces):
@@ -98,16 +98,17 @@ def test_add_instance_from_source(vim):
 ])
 def test_add_link(vim, add_link, expected_exec_code):
     image = 'ubuntu:trusty'
+    interface = 'emu0'
 
     name1 = 'tangotest_test1'
-    instance1 = vim.add_instance_from_image(name=name1, image=image)
+    instance1 = vim.add_instance_from_image(name=name1, image=image, interfaces=[interface])
 
     name2 = 'tangotest_test2'
-    instance2 = vim.add_instance_from_image(name=name2, image=image)
-    instance2_ip = instance2.get_ip(0)
+    instance2 = vim.add_instance_from_image(name=name2, image=image, interfaces=[interface])
+    instance2_ip = instance2.get_ip(interface)
 
     if add_link:
-        vim.add_link(name1, 'cp0', name2, 'cp0')
+        vim.add_link(name1, interface, name2, interface)
 
     cmd = 'ping -c1 -W1 {}'.format(instance2_ip)
     exec_code, exec_output = instance1.execute(cmd)
@@ -124,22 +125,23 @@ def test_add_test_vnf(vim, test_vnf):
 
 def test_get_traffic(vim):
     image = 'ubuntu:trusty'
+    interface = 'emu0'
 
     name1 = 'tangotest_test1'
-    instance1 = vim.add_instance_from_image(name=name1, image=image)
+    instance1 = vim.add_instance_from_image(name=name1, image=image, interfaces=[interface])
 
     name2 = 'tangotest_test2'
-    instance2 = vim.add_instance_from_image(name=name2, image=image)
-    instance2_ip = instance2.get_ip(0)
+    instance2 = vim.add_instance_from_image(name=name2, image=image, interfaces=[interface])
+    instance2_ip = instance2.get_ip(interface)
 
-    vim.add_link(name1, 'cp0', name2, 'cp0', sniff=True)
-    traffic_start = vim.get_traffic(name1, 'cp0', name2, 'cp0')
+    vim.add_link(name1, interface, name2, interface, sniff=True)
+    traffic_start = vim.get_traffic(name1, interface, name2, interface)
 
     cmd = 'ping -c1 -W1 {}'.format(instance2_ip)
     exec_code, exec_output = instance1.execute(cmd)
     assert exec_code == 0
 
     time.sleep(10)
-    traffic_end = vim.get_traffic(name1, 'cp0', name2, 'cp0')
+    traffic_end = vim.get_traffic(name1, interface, name2, interface)
 
     assert len(traffic_start) < len(traffic_end)
