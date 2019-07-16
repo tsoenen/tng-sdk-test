@@ -92,7 +92,7 @@ class DockerBasedVIM(BaseVIM):
         if not self._image_exists(image):
             raise Exception('Docker image {} not found'.format(image))
 
-        container = self.docker_client.containers.run(name=name, image=image, command=docker_command,
+        self.docker_client.containers.run(name=name, image=image, command=docker_command,
                                                       tty=True, detach=True, **docker_run_args)
         return self._add_instance(name)
 
