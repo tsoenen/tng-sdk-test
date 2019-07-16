@@ -196,9 +196,9 @@ class Emulator(DockerBasedVIM):
             pass
         elif isinstance(interfaces, int):
             interfaces = ','.join(['(id=emu{})'.format(i) for i in range(interfaces)])
-        elif isinstance(network, list):
+        elif isinstance(interfaces, list):
             interfaces = ','.join(['(id={})'.format(i) for i in interfaces])
-        elif isinstance(network, dict):
+        elif isinstance(interfaces, dict):
             interfaces = ','.join(['(id={},ip={})'.format(k, v) for k, v in interfaces.items()])
         else:
             raise Exception('Wrong network configuration: {}'.format(interfaces))
