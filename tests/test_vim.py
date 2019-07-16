@@ -85,7 +85,7 @@ def test_add_instance_from_source(vim):
     test_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     path = test_dir + '/vnfs/empty'
     interface = 'cp0'
-    instance = vim.add_instance_from_source(name=name, path=path)
+    instance = vim.add_instance_from_source(name=name, path=path, interfaces=[interface])
     cmd = 'cat /sys/class/net/{}/operstate'.format(interface)
     exec_code, exec_output = instance.execute(cmd)
     assert exec_code == 0
