@@ -113,14 +113,14 @@ class BaseVIM(object):
         pass
 
     @abstractmethod
-    def add_instance_from_image(self, name, image, network=None, **args):
+    def add_instance_from_image(self, name, image, interfaces=None, **args):
         """
         Run an image.
 
         Args:
             name (str): The name of an instance
             image (str): The name of an image
-            network (int) or (list) or (dict): Network configuration
+            interfaces (int) or (list) or (dict): Network configuration
             args: Platform-specific parameters
 
         Returns:
@@ -129,14 +129,14 @@ class BaseVIM(object):
         pass
 
     @abstractmethod
-    def add_instance_from_source(self, name, path, network=None, permanent_name=None, **args):
+    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None, **args):
         """
         Build and run an image on the VIM.
 
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
-            network (int) or (list) or (dict): Network configuration
+            interfaces (int) or (list) or (dict): Network configuration
             permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
             args: Platform-specific parameters
 
@@ -162,9 +162,9 @@ class BaseVIM(object):
 
         image = 'tango{}'.format(vnf_name)
         if self._image_exists(image):
-            return self.add_instance_from_image(name, image, vnf['network'])
+            return self.add_instance_from_image(name, image, vnf['interfaces'])
         else:
-            return self.add_instance_from_source(name, vnf['source'], vnf['network'], permanent_name=image)
+            return self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
 
     @abstractmethod
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):
@@ -189,10 +189,10 @@ class BaseVIM(object):
         self.add_test_vnf(sniffer_name, 'sniffer')
 
         self.add_link(src_vnf, src_if,
-                      sniffer_name, vnfs.get('sniffer')[0],
+                      sniffer_name, vnfs['sniffer']['interfaces'][0],
                       sniff=False, **kwargs)
 
-        self.add_link(sniffer_name, vnfs.get('sniffer')[1],
+        self.add_link(sniffer_name, vnfs['sniffer']['interfaces'][1],
                       dst_vnf, dst_if,
                       sniff=False, **kwargs)
 

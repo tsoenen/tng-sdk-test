@@ -78,14 +78,14 @@ class DockerBasedVIM(BaseVIM):
             raise e
         return True
 
-    def add_instance_from_image(self, name, image, network=None, docker_command='/bin/bash', **docker_run_args):
+    def add_instance_from_image(self, name, image, interfaces=None, docker_command='/bin/bash', **docker_run_args):
         """
         Run a Docker image on the Emulator.
 
         Args:
             name (str): The name of an instance
             image (str): The name of an image
-            network (int) or (list) or (dict): Network configuration (if supported)
+            interfaces (int) or (list) or (dict): Network configuration
             docker_command (str): The command to execute when starting the instance
 
         Returns:
@@ -100,7 +100,7 @@ class DockerBasedVIM(BaseVIM):
         self.containers.append(container)
         return self._add_instance(name)
 
-    def add_instance_from_source(self, name, path, network=None, permanent_name=None,
+    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
                                  docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator.
@@ -108,7 +108,7 @@ class DockerBasedVIM(BaseVIM):
         Args:
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
-            network (int) or (list) or (dict): Network configuration
+            interfaces (int) or (list) or (dict): Network configuration
             permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
             docker_command (str): The command to execute when starting the instance
             **docker_build_args: Extra arguments to be used by the Docker engine to build the image
@@ -133,7 +133,7 @@ class DockerBasedVIM(BaseVIM):
         if not permanent_name:
             self.built_images.append(tag)
 
-        return self.add_instance_from_image(name, tag, network)
+        return self.add_instance_from_image(name, tag, interfaces)
 
 
 class DockerBasedInstance(BaseInstance):
