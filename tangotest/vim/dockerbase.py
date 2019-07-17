@@ -44,7 +44,6 @@ class DockerBasedVIM(BaseVIM):
 
     def __init__(self, *args, **kwargs):
         super(DockerBasedVIM, self).__init__(*args, **kwargs)
-        self.built_images = []
 
     @abstractproperty
     def InstanceClass(self):
@@ -55,8 +54,6 @@ class DockerBasedVIM(BaseVIM):
         self.docker_client = docker.from_env()
 
     def stop(self):
-        for image in self.built_images:
-            self.docker_client.images.remove(image=image, force=True)
         super(DockerBasedVIM, self).stop()
 
     def _image_exists(self, image):
@@ -96,7 +93,7 @@ class DockerBasedVIM(BaseVIM):
                                           tty=True, detach=True, **docker_run_args)
         return self._add_instance(name)
 
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
+    def add_instance_from_source(self, name, path, interfaces=None, image_name=None,
                                  docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator.
@@ -105,7 +102,7 @@ class DockerBasedVIM(BaseVIM):
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
             interfaces (int) or (list) or (dict): Network configuration
-            permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
+            image_name (str): The name of an image. Default: tangotest<name>
             docker_command (str): The command to execute when starting the instance
             **docker_build_args: Extra arguments to be used by the Docker engine to build the image
 
@@ -119,15 +116,9 @@ class DockerBasedVIM(BaseVIM):
         if not os.path.isfile('{}Dockerfile'.format(path)):
             raise Exception('Dockerfile in {} not found'.format(path))
 
-        if permanent_name:
-            tag = permanent_name
-        else:
-            tag = 'tangotest{}'.format(name)
+        tag = image_name or 'tangotest{}'.format(name)
         docker_image, _ = self.docker_client.images.build(path=path, **docker_build_args)
         docker_image.tag(tag)
-
-        if not permanent_name:
-            self.built_images.append(tag)
 
         return self.add_instance_from_image(name, tag, interfaces)
 
