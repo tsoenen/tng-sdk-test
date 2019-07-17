@@ -217,7 +217,7 @@ class Emulator(DockerBasedVIM):
         return self._add_instance(name)
 
     @vnv_called_without_parameter('interfaces')
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None,
+    def add_instance_from_source(self, name, path, interfaces=None, image_name=None,
                                  docker_command=None, **docker_build_args):
         """
         Build and run a Docker image on the Emulator.
@@ -226,7 +226,7 @@ class Emulator(DockerBasedVIM):
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
             interfaces (int), (list) (str) or (dict): Network configuration
-            permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
+            image_name (str): The name of an image. Default: tangotest<name>
             docker_command (str): The command to execute when starting the instance
             **docker_build_args: Extra arguments to be used by the Docker engine to build the image
 
@@ -234,7 +234,7 @@ class Emulator(DockerBasedVIM):
             (EmulatorInstance): The added instance
         """
         return super(Emulator, self).add_instance_from_source(name, path, interfaces,
-                                                              permanent_name, docker_command,
+                                                              image_name, docker_command,
                                                               **docker_build_args)
 
     @vnv_not_called

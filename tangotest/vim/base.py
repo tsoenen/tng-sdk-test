@@ -129,7 +129,7 @@ class BaseVIM(object):
         pass
 
     @abstractmethod
-    def add_instance_from_source(self, name, path, interfaces=None, permanent_name=None, **args):
+    def add_instance_from_source(self, name, path, interfaces=None, image_name=None, **args):
         """
         Build and run an image on the VIM.
 
@@ -137,7 +137,7 @@ class BaseVIM(object):
             name (str): The name of an instance
             path (str): The path to the directory containing Dockerfile
             interfaces (int) or (list) or (dict): Network configuration
-            permanent_name (str): The name of an image. If not (None) the image will not be deleted after test execution
+            image_name (str): The name of an image. Default: tangotest<name>
             args: Platform-specific parameters
 
         Returns:
