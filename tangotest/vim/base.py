@@ -160,11 +160,11 @@ class BaseVIM(object):
         if not vnf:
             raise Exception('Test vnf {} not found'.format(vnf_name))
 
-        image = 'tango{}'.format(vnf_name)
+        image = vnf['image_name']
         if self._image_exists(image):
             return self.add_instance_from_image(name, image, vnf['interfaces'])
         else:
-            return self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], permanent_name=image)
+            return self.add_instance_from_source(name, vnf['source'], vnf['interfaces'], image_name=image)
 
     @abstractmethod
     def add_link(self, src_vnf, src_if, dst_vnf, dst_if, sniff=False, **kwargs):

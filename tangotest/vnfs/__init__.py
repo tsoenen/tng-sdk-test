@@ -38,10 +38,12 @@ _vnfs_dir = os.path.join(tangotest.__path__[0], 'vnfs')
 
 vnfs = {
     'sniffer': {
+        'image_name': 'tangosniffer2',
         'source': os.path.join(_vnfs_dir, 'sniffer'),
         'interfaces': ['input', 'output']
     },
     'generator': {
+        'image_name': 'tangogenerator',
         'source': os.path.join(_vnfs_dir, 'generator'),
         'interfaces': ['cp01']
     }
