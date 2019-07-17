@@ -137,11 +137,12 @@ def test_get_traffic(vim):
     vim.add_link(name1, interface, name2, interface, sniff=True)
     traffic_start = vim.get_traffic(name1, interface, name2, interface)
 
+    time.sleep(2)
     cmd = 'ping -c1 -W1 {}'.format(instance2_ip)
     exec_code, exec_output = instance1.execute(cmd)
     assert exec_code == 0
 
-    time.sleep(10)
+    time.sleep(2)
     traffic_end = vim.get_traffic(name1, interface, name2, interface)
 
     assert len(traffic_start) < len(traffic_end)

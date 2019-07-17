@@ -9,7 +9,9 @@ brctl addbr br0
 brctl addif br0 $IFIN $IFOUT
 ifconfig br0 up
 
-sleep 5
+while ! ifconfig -s | grep "br0" > /dev/null; do
+  sleep 0.2
+done
 
 tshark -l -T json > tangosniffed.json &
 
