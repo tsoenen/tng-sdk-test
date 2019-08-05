@@ -284,7 +284,7 @@ class BaseInstance(object):
             (str) or (None): The MAC address of the interface or None if the interface doesn't exist
         """
 
-        cmd = 'cat /sys/class/net/{}/address'.foramt(interface)
+        cmd = 'cat /sys/class/net/{}/address'.format(interface)
         code, output = self.execute(cmd)
 
         mac = output.strip()
