@@ -51,7 +51,7 @@ class DockerBasedVIM(BaseVIM):
 
     def start(self):
         super(DockerBasedVIM, self).start()
-        self.docker_client = docker.from_env()
+        self.docker_client = docker.from_env(timeout=999999)
 
     def stop(self):
         super(DockerBasedVIM, self).stop()
