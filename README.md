@@ -8,14 +8,21 @@
 
 This repository contains a Python library `tangotest` for automated functional testing of VNFs.
 
-[The Emulator](https://osm.etsi.org/wikipub/index.php/VIM_emulator) is a light-weight emulation platform based on Containernet. Containernet is Mininet fork adding support for container-based (e.g. Docker) emulated hosts.
-VIM-EMU is used by the library to run tests locally.
-Then the library can be used to build a probe and generate a test descriptor to run tests on the V&V platform.
+The library helps test developers to write functional tests in Python and run locally or in CI/CD environments.
+Using the library, test developers choose which infrastructure to use, which network services and test VNFs to launch, how to interconnect them, how to trigger the test process and inspect, verify and validate the output against the expected values and conditions.
+Test developers can use network service packages to deploy services or can compose them directly in a test code.
+
 
 ## Requirements
 
 - Ubuntu 16.04+
 - python 2.7
+
+## Dependencies
+
+VIM-EMU is a light-weight emulation platform that is used by the library to run tests locally.
+Detailed describtion and installation instructions can be found on the project page:
+[https://osm.etsi.org/wikipub/index.php/VIM_emulator](https://osm.etsi.org/wikipub/index.php/VIM_emulator).
 
 ## Installation
 
@@ -31,8 +38,6 @@ or
 pip2 install git+https://github.com/sonata-nfv/tng-sdk-test
 ```
 
-In order to run tests locally, the Emulator needs to be installed separately.
-[Installation instructions for the Emulator](https://osm.etsi.org/wikipub/index.php/VIM_emulator).
 
 ## Usage
 
@@ -40,8 +45,30 @@ In order to run tests locally, the Emulator needs to be installed separately.
 
 
 ### Examples
-See [examples](https://github.com/sonata-nfv/tng-sdk-test/tree/master/examples) folder of this repository
 
+A simple example of library usage:
+
+```
+from tangotest.vim.emulator import Emulator
+
+
+with Emulator() as vim:
+    client = vim.add_instance_from_source('client', './client_vnf', ['emu0'])
+    server = vim.add_instance_from_source('server', './server_vnf', ['emu0'])
+    vim.add_link('client', 'emu0', 'server', 'emu0')
+
+    cmd = 'curl {}'.format(server.get_ip('emu0'))
+    exec_code, output = client.execute(cmd)
+
+    assert exec_code == 0
+    assert output == 'Hello World!'
+```
+
+You can use [UnitTest](https://docs.python.org/2/library/unittest.html) or [pytest](https://docs.pytest.org/en/latest/) to manage your test cases.
+
+*Note:* Tests need to be run with `sudo`.
+
+See [examples](https://github.com/sonata-nfv/tng-sdk-test/tree/master/examples) folder of this repository for more examples.
 
 ## License
 
