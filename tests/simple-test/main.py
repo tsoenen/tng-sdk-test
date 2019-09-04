@@ -35,10 +35,7 @@ from tangotest.utils import SNORT_TIME_FORMAT, SNIFFER_TIME_FORMAT
 
 
 with vim_from_env() as vim:
-    tester = vim.add_instance_from_image('tester', 'ubuntu:xenial')
+    tester = vim.add_instance_from_image('tangotest_testprobe', 'ubuntu:xenial')
     cmd = 'echo hello world'
     _, output = tester.execute(cmd)
     print(output)
-
-
-

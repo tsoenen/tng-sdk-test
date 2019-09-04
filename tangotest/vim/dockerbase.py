@@ -55,6 +55,8 @@ class DockerBasedVIM(BaseVIM):
 
     def stop(self):
         super(DockerBasedVIM, self).stop()
+        for name, instance in self.instances.items():
+            instance.stop()
 
     def _image_exists(self, image):
         try:
@@ -150,3 +152,9 @@ class DockerBasedInstance(BaseInstance):
 
     def execute(self, cmd, stream=False, **kwargs):
         return self.container.exec_run(cmd=['sh', '-c', cmd], stream=stream, **kwargs)
+
+    def stop(self):
+        try:
+            self.container.remove(force=True)
+        except Exception:
+            pass

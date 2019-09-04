@@ -267,3 +267,6 @@ class EmulatorInstance(DockerBasedInstance):
     @property
     def container_name(self):
         return 'mn.{}'.format(self.name)
+
+    def stop(self):
+        pass
