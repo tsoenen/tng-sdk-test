@@ -142,7 +142,7 @@ def test_get_traffic(vim):
     exec_code, exec_output = instance1.execute(cmd)
     assert exec_code == 0
 
-    time.sleep(2)
+    time.sleep(5)
     traffic_end = vim.get_traffic(name1, interface, name2, interface)
 
     assert len(traffic_start) < len(traffic_end)
