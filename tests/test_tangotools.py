@@ -182,7 +182,11 @@ def test_probe_builder():
     }
 
     docker_client = docker.from_env()
-    test_results = docker_client.containers.run(image=image_name, volumes=volumes, tty=True, command=command, remove=True)
+    try:
+        test_results = docker_client.containers.run(image=image_name, volumes=volumes, tty=True, command=command, remove=True)
+    except docker.errors.ContainerError as e:
+        print(e.stderr)
+        assert False
 
     expected_results = b'hello world\r\n\r\n'
     assert test_results == expected_results
