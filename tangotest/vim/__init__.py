@@ -38,11 +38,10 @@ from contextlib import contextmanager
 def vim_from_env():
     platform = os.environ.get('TANGOTEST_PLATFORM', 'EMULATOR')
     if platform == 'EMULATOR':
+        vnv_checker = bool(os.environ.get('TANGOTEST_VNV_CHECKER', 0))
+        enable_learning = bool(os.environ.get('TANGOTEST_ENABLE_LEARNING', 0))
         from tangotest.vim.emulator import Emulator
-        vim = Emulator()
-    elif platform == 'EMULATOR_VNV_CHECKER':
-        from tangotest.vim.emulator import Emulator
-        vim = Emulator(vnv_checker=True)
+        vim = Emulator(enable_learning=enable_learning, vnv_checker=vnv_checker)
     elif platform == 'VNV':
         from tangotest.vim.vnv import Vnv
         vim = Vnv()
