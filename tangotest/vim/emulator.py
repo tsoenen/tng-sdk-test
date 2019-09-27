@@ -76,16 +76,23 @@ class Emulator(DockerBasedVIM):
         >>>      /* your code here */
     """
 
-    def __init__(self, enable_learning=False, vnv_checker=False, *args, **kwargs):
+    def __init__(self, endpoint_port=None, tango_port=None, sonata_port=None,
+                 enable_learning=False, vnv_checker=False, *args, **kwargs):
         """
         Initialize the Emulator.
         This method doesn't start the Emulator.
 
         Args:
+            endpoint_port (int): vim-emu REST API port. Default: random free port
+            tango_port (int): Sonata gatekeeper port. Default: random free port
+            sonata_port (int): Tango gatekeeper port. Default: random free port
             vnv_checker (bool): Check if the code can be reused on the 5GTANGO V&V platform
             enable_learning (bool): Enable learning switch
         """
         super(Emulator, self).__init__(*args, **kwargs)
+        self.endpoint_port = endpoint_port
+        self.tango_port = tango_port
+        self.sonata_port = sonata_port
         self.vnv_checker = vnv_checker
         self.enable_learning = enable_learning
 
@@ -106,7 +113,7 @@ class Emulator(DockerBasedVIM):
         self.datacenter = self.net.addDatacenter('dc1')
 
         endpoint_ip = '0.0.0.0'
-        endpoint_port = get_free_tcp_port()
+        endpoint_port = self.endpoint_port or get_free_tcp_port()
         self.endpoint = 'http://{}:{}'.format(endpoint_ip, endpoint_port)
 
         self.rest_api = RestApiEndpoint(endpoint_ip, endpoint_port)
@@ -115,14 +122,14 @@ class Emulator(DockerBasedVIM):
         self.rest_api.start()
 
         sonata_ip = '0.0.0.0'
-        sonata_port = get_free_tcp_port()
+        sonata_port = self.sonata_port or get_free_tcp_port()
         self.sonata_address = 'http://{}:{}'.format(sonata_ip, sonata_port)
         self.sonata_gatekeeper = SonataDummyGatekeeperEndpoint(sonata_ip, sonata_port)
         self.sonata_gatekeeper.connectDatacenter(self.datacenter)
         self.sonata_gatekeeper.start()
 
         tango_ip = '0.0.0.0'
-        tango_port = get_free_tcp_port()
+        tango_port = self.tango_port or get_free_tcp_port()
         self.tango_address = 'http://{}:{}'.format(tango_ip, tango_port)
         self.tango_gatekeeper = TangoLLCMEndpoint(tango_ip, tango_port)
         self.tango_gatekeeper.connectDatacenter(self.datacenter)
