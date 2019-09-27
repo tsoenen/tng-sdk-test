@@ -31,10 +31,8 @@
 # partner consortium (www.5gtango.eu).
 
 import os
-from contextlib import contextmanager
 
 
-@contextmanager
 def vim_from_env():
     platform = os.environ.get('TANGOTEST_PLATFORM', 'EMULATOR')
     if platform == 'EMULATOR':
@@ -47,7 +45,4 @@ def vim_from_env():
         vim = Vnv()
     else:
         raise Exception('Unkown platform {}'.format(platform))
-
-    vim.start()
-    yield vim
-    vim.stop()
+    return vim
