@@ -113,7 +113,7 @@ def build_probe(tests_path, probe_name=None):
     dockerfile.write(dockerfile_content)
 
     docker_client = docker.from_env()
-    docker_image, _ = docker_client.images.build(path=tests_path, dockerfile=dockerfile.name)
+    docker_image = docker_client.images.build(path=tests_path, dockerfile=dockerfile.name)
 
     tag = probe_name or 'tng-sdk-test-{}'.format(time.strftime("%Y-%m-%d-%H-%M-%S"))
     docker_image.tag(tag)
