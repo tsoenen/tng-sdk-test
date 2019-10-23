@@ -34,7 +34,7 @@ import os
 
 from tangotest.vim.dockerbase import DockerBasedVIM, DockerBasedInstance
 from tangotest.vim.base import BaseImmutableInstance
-from tangotest.tangotools.package_parser import parse_package
+from tangotest.tangotools import parse_package
 
 
 class Vnv(DockerBasedVIM):

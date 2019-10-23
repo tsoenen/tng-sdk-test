@@ -38,8 +38,7 @@ import docker
 
 from tangotest.vim.emulator import Emulator
 from tangotest.tangotools.vnv_checker import VnvError
-from tangotest.tangotools.package_parser import parse_package
-from tangotest.tangotools.probe_builder import build_probe
+from tangotest.tangotools import parse_package, build_probe
 
 
 packages = [(
