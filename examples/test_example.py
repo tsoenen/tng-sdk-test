@@ -41,13 +41,13 @@ from tangotest.utils import SNORT_TIME_FORMAT, SNIFFER_TIME_FORMAT
 @pytest.fixture(scope='module')
 def testbed():
     with Emulator() as vim:
-        vim.add_instance_from_source('client', 'tangoclient')
-        vim.add_instance_from_source('server', 'tangoserver')
-        vim.add_instance_from_source('firewall', 'tangofirewall', ['input', 'output'])
-        vim.add_instance_from_source('snort', 'tangosnort', ['input', 'output'])
-        vim.add_link('client', 'cp0', 'firewall', 'input')
+        vim.add_instance_from_source('client', 'client')
+        vim.add_instance_from_source('server', 'server')
+        vim.add_instance_from_source('firewall', 'firewall', ['input', 'output'])
+        vim.add_instance_from_source('snort', 'snort', ['input', 'output'])
+        vim.add_link('client', 'emu0', 'firewall', 'input')
         vim.add_link('firewall', 'output', 'snort', 'input', sniff=True)
-        vim.add_link('snort', 'output', 'server', 'cp0')
+        vim.add_link('snort', 'output', 'server', 'emu0')
         yield vim
 
 
@@ -57,7 +57,7 @@ def testbed():
     ('/error', 'Error 404')
 ])
 def test_server(test_input, expected_output, testbed):
-    test_command = 'curl -s {}{}'.format(testbed.server.get_ip(0), test_input)
+    test_command = 'curl -s {}{}'.format(testbed.server.get_internal_ip('emu0'), test_input)
     _, actual_output = testbed.client.execute(test_command)
 
     assert expected_output == actual_output
@@ -70,7 +70,7 @@ def test_server(test_input, expected_output, testbed):
 def test_snort(test_input, expected_output, testbed):
     start_time = datetime.datetime.utcnow()
 
-    server_ip = testbed.server.get_ip(0)
+    server_ip = testbed.server.get_internal_ip('emu0')
     test_command = 'curl -s {}{}'.format(server_ip, test_input)
     testbed.client.execute(test_command)
     time.sleep(1)
@@ -95,8 +95,8 @@ def test_firewall(testbed):
     test_command = 'iptables -P FORWARD DROP'
     testbed.firewall.execute(test_command)
 
-    server_ip = testbed.server.get_ip(0)
-    client_ip = testbed.client.get_ip(0)
+    server_ip = testbed.server.get_internal_ip('emu0')
+    client_ip = testbed.client.get_internal_ip('emu0')
     test_command = 'ping -c 1 -W 5 {}'.format(server_ip)
 
     start_time = datetime.datetime.utcnow()

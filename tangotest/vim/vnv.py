@@ -92,15 +92,3 @@ class VnvImmutableInstance(BaseImmutableInstance):
 
         env_name = '{}_{}'.format(self.name, interface)
         return os.environ.get(env_name, None)
-
-    def get_mac(self, interface):
-        """
-        Get a MAC address of an interface.
-
-        Args:
-            interface (str): The name of the interface
-
-        Returns:
-            (str) or (None): The MAC address of the interface or None if the interface doesn't exist
-        """
-        raise Exception('Can not get mac address of an immutable instance')

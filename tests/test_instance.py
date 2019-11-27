@@ -44,8 +44,8 @@ def test_execute(vnf, cmd, expected_exec_output, expected_exec_code):
     assert exec_output.strip() == expected_exec_output.strip()
 
 
-def test_get_ip(vnf):
-    ip = vnf.get_ip('emu0')
+def test_get_internal_ip(vnf):
+    ip = vnf.get_internal_ip('emu0')
     cmd = 'ping -c1 -W1 {}'.format(ip)
     exec_code, exec_output = vnf.execute(cmd)
     assert exec_code == 0

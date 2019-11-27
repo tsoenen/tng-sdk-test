@@ -262,6 +262,19 @@ class BaseInstance(object):
             (str) or (None): The IP address of the interface or None if the interface doesn't exist
                              or if the interface has no IP address
         """
+        return '127.0.0.1'
+
+    def get_internal_ip(self, interface):
+        """
+        Get an IP address of an interface.
+
+        Args:
+            interface (str): The name of the interface
+
+        Returns:
+            (str) or (None): The IP address of the interface or None if the interface doesn't exist
+                             or if the interface has no IP address
+        """
 
         cmd = 'ip -4 addr show {} | grep -oP \'(?<=inet\s)\d+(\.\d+){{3}}\''.format(interface)
         code, output = self.execute(cmd)
@@ -350,6 +363,20 @@ class BaseImmutableInstance(BaseInstance):
         pass
 
     @abstractmethod
+    def get_internal_ip(self, interface):
+        """
+        Get an IP address of an interface.
+
+        Args:
+            interface (str): The name of the interface
+
+        Returns:
+            (str) or (None): The IP address of the interface or None if the interface doesn't exist
+                             or if the interface has no IP address
+        """
+        raise Exception('Can not get IP address of an immutable instance')
+
+    @abstractmethod
     def get_mac(self, interface):
         """
         Get a MAC address of an interface.
@@ -360,4 +387,4 @@ class BaseImmutableInstance(BaseInstance):
         Returns:
             (str) or (None): The MAC address of the interface or None if the interface doesn't exist
         """
-        pass
+        raise Exception('Can not get MAC address of an immutable instance')
