@@ -103,6 +103,7 @@ def build_probe(tests_path, probe_name=None):
         python-pip \
         git \
         libltdl-dev
+    ENV SPAM NIII
     RUN pip install git+https://github.com/tsoenen/tng-sdk-test
     COPY . /
     RUN pip install pytest==4.6.4
@@ -232,7 +233,7 @@ def generate_test_descriptor(probe_name, package_data):
                     'image': 'tsoenen/{}'.format(probe_name),
                     'description': 'A container with tng-sdk-test and the test code',
                     'parameters': [{
-                        'key': '{}'.format(vnf),
+                        'key': '{}'.format(vnf.replace('-','_')),
                         'value': '$({}/endpoints/id:floating_ip/address)'.format(vnf)
                     } for vnf in package_data['endpoints']],
                 }],
